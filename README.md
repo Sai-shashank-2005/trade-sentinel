@@ -1,198 +1,216 @@
+# 🚀 Trade Sentinel AI
+
+## Context-Aware Hybrid Trade Risk Intelligence System
+
+Trade Sentinel AI is a full-stack hybrid anomaly detection platform designed to detect suspicious international trade transactions while significantly reducing false positives through behavioral calibration.
+
+Developed for: **TNI26183 – Difficulty Detecting Fraud and Anomalies in Trade Transactions**
 
 ---
 
-# 🚀 Trade Sentinel AI v2
+# 📌 Overview
 
-### Hybrid Context-Aware Trade Risk Intelligence Platform
+Trade-based fraud such as:
 
----
+- Over-invoicing  
+- Under-invoicing  
+- Abnormal routing  
+- Suspicious counterparties  
 
-## 📌 Overview
+is difficult to detect using static rule-based systems alone.
 
-**Trade Sentinel AI v2** is a full-stack hybrid fraud detection system designed to detect anomalies in international trade transactions while reducing false positives through contextual calibration.
+Traditional monitoring systems suffer from:
 
-This platform combines:
+- High false positive rates  
+- Alert fatigue  
+- Lack of explainability  
+- Operational inefficiency  
 
-* Isolation Forest (AI anomaly detection)
-* Statistical rule engine (Z-score based scoring)
-* Hybrid weighted risk model
-* Context-aware alert suppression
-* Confidence scoring
-* Structured explainability
-* Investigation dashboard (React + Tailwind)
-
-The system preserves high-risk alerts while intelligently reducing noise in low and medium-risk categories.
+Trade Sentinel AI introduces a layered hybrid detection architecture combining statistical modeling, machine learning, deterministic rules, and bounded contextual calibration.
 
 ---
 
-# 🧠 Problem Statement
-
-Trade-based fraud (over/under invoicing, abnormal routing, suspicious counterparties) is difficult to detect using static rules alone.
-
-Challenges include:
-
-* High false positive rates
-* Alert fatigue
-* Lack of explainability
-* Operational inefficiency
-
-Trade Sentinel AI v2 addresses these through a layered hybrid detection architecture.
-
----
-
-# 🏗️ System Architecture
+# 🧠 System Architecture
 
 ```
-Synthetic Trade Data (50,000 records, 6% anomalies)
-        ↓
-Feature Engineering (Z-score, frequency metrics)
-        ↓
-Isolation Forest → AI Score (0–100 percentile)
-        ↓
+Trade Data
+    ↓
+Feature Engineering
+    ↓
+Isolation Forest → AI Score (0–100)
+    ↓
 Rule Engine → Rule Score (0–100)
-        ↓
-Hybrid Risk Engine
-Raw Risk = 0.6 * AI + 0.4 * Rule
-        ↓
-Context Adjustment Layer
-(Max 20% suppression for stable behavior)
-        ↓
-Final Risk + Confidence Score
-        ↓
-Explainability Engine
-        ↓
-React Investigation Dashboard
+    ↓
+Hybrid Risk Model
+    ↓
+Context-Aware Calibration
+    ↓
+Final Risk + Confidence
+    ↓
+Explainable Investigation Dashboard
 ```
 
 ---
 
 # 🔍 Core Detection Components
 
-## 1️⃣ AI Model
+## 1️⃣ Feature Engineering
 
-* Isolation Forest (unsupervised anomaly detection)
-* Features:
+Category-aware statistical normalization:
 
-  * `price_zscore`
-  * `volume_zscore`
-  * `route_frequency`
-  * `counterparty_frequency`
-* Converted to percentile-based AI score (0–100)
+- Price Z-score (grouped by HS code)
+- Volume Z-score (grouped by HS code)
+- Route frequency
+- Counterparty frequency
+
+This ensures anomaly detection is product-category specific and behavior-aware.
 
 ---
 
-## 2️⃣ Rule Engine
+## 2️⃣ AI Model — Isolation Forest
 
-| Condition           | Score |
-| ------------------- | ----- |
-| Price Z > 5         | +40   |
-| Price Z > 3         | +30   |
-| Volume Z > 5        | +30   |
-| Volume Z > 3        | +20   |
-| Rare Route (<1%)    | +20   |
-| Rare Exporter (<1%) | +10   |
+- Unsupervised anomaly detection
+- Multi-dimensional anomaly detection
+- Percentile-based anomaly scoring (0–100)
+
+Isolation Forest isolates anomalies through random feature partitioning.  
+Anomalies require fewer splits, resulting in higher anomaly scores.
+
+---
+
+## 3️⃣ Rule Engine
+
+Deterministic compliance logic:
+
+| Condition              | Score |
+|------------------------|-------|
+| Price Z > 5            | +40   |
+| Price Z > 3            | +30   |
+| Volume Z > 5           | +30   |
+| Volume Z > 3           | +20   |
+| Rare Route (<1%)       | +20   |
+| Rare Exporter (<1%)    | +10   |
 
 Rule score capped at 100.
 
 ---
 
-## 3️⃣ Hybrid Risk Model
+## 4️⃣ Hybrid Risk Model
 
 ```
 raw_risk = 0.6 * ai_score + 0.4 * rule_score
 ```
 
-Risk Levels:
+Risk Classification:
+- **High** ≥ 75
+- **Medium** ≥ 50
+- **Low** < 50
 
-* **High** ≥ 75
-* **Medium** ≥ 50
-* **Low** < 50
-
----
-
-## 4️⃣ Context-Aware Calibration
-
-High-risk alerts are preserved.
-
-Low & medium risks are adjusted downward if:
-
-* Route is historically stable
-* Counterparty is historically stable
-
-Maximum suppression capped at 20%.
-
-This reduces false positives without masking serious fraud.
+Hybridization balances statistical anomaly detection with deterministic regulatory logic.
 
 ---
 
-# 📊 Dataset & Results
+## 5️⃣ Context-Aware Calibration (Core Innovation)
 
-* Total Transactions: **50,000**
-* Synthetic Anomalies Injected: **6% (3,000 records)**
+The context layer performs bounded behavioral risk adjustment.
 
-### Output Risk Distribution
+Rules:
 
-| Risk Level | Count  | Percentage |
-| ---------- | ------ | ---------- |
-| High       | 230    | 0.46%      |
-| Medium     | 3,173  | 6.3%       |
-| Low        | 46,597 | 93.2%      |
+- High-risk alerts are never suppressed.
+- Medium and low risks are reduced if:
+  - Route behavior is stable.
+  - Counterparty behavior is stable.
+- Maximum suppression capped at **20%**.
 
-Total flagged (High + Medium): **3,403**
+```
+FinalRisk = RawRisk × ContextFactor
+ContextFactor ∈ [0.8, 1.0]
+```
 
-Detection proportion aligns closely with injected anomaly rate.
-
----
-
-# 🖥️ System Interface Preview
-
-## 📊 Dashboard
-
-![Dashboard](./assets/dashboard.png)
-
-## 📋 Transactions Page
-
-![Transactions](./assets/transactions.png)
-
-## 🔎 Investigation Detail View
-
-![Transaction Detail](./assets/detail.png)
+This significantly reduces false positives while preserving high-risk fraud detection.
 
 ---
 
-# ⚙️ Tech Stack
+# 📊 Experimental Validation
+
+## Dataset
+- 50,000 synthetic trade transactions
+- 6% injected anomalies (3,000 records)
+
+## Results (Medium + High flagged as anomaly)
+
+| Model Version       | Precision | Recall | False Positives |
+|---------------------|-----------|--------|----------------|
+| Hybrid Only         | ~36%      | 100%   | 5,333          |
+| Hybrid + Context    | ~88%      | ~99%   | 418            |
+
+False positives reduced by over **90%** after context calibration.
+
+---
+
+## 🔬 Scalability Test
+
+Tested on **100,000 transactions**:
+
+- Precision: ~83–88%
+- Recall: ~99%
+- False Positive Rate: ~1%
+
+Performance remains stable as dataset size increases.
+
+---
+
+# 🖥️ Investigation Dashboard
+
+### 📊 Risk Dashboard
+
+![Dashboard](assets/dashboard.png)
+
+---
+
+### 📋 Transactions View
+
+![Transactions](assets/transactions.png)
+
+---
+
+### 🔎 Investigation Detail View
+
+![Transaction Detail](assets/detail.png)
+
+---
+
+# ⚙️ Technology Stack
 
 ## Backend
 
-* FastAPI
-* SQLAlchemy
-* Pandas
-* NumPy
-* Scikit-learn
-* SQLite (local)
-* PostgreSQL (production-ready)
+- FastAPI
+- SQLAlchemy
+- Pandas
+- NumPy
+- Scikit-learn
+- PostgreSQL (Production)
+- SQLite (Local)
 
 ## Frontend
 
-* React
-* Tailwind CSS
-* Vite
-* Recharts
-* React Router
-
-## Deployment
-
-* Vercel (Frontend)
-* Railway / PostgreSQL compatible backend
+- React
+- Vite
+- Tailwind CSS
+- Recharts
+- React Router
 
 ---
 
-# 📂 Project Structure
+# 🏗️ Project Structure
 
 ```
-trade-sentinel-ai-v2/
+trade-sentinel-ai/
 │
 ├── backend/
+│   ├── app/
+│   └── tests/
+│
 ├── frontend/
 ├── assets/
 ├── README.md
@@ -201,129 +219,75 @@ trade-sentinel-ai-v2/
 
 ---
 
-# 🚀 Running Locally
+# 🚀 Local Setup
 
----
+## 🔹 Backend
 
-# 🔹 Backend Setup (FastAPI)
-
-### 1️⃣ Navigate to backend folder
-
-```
+```bash
 cd backend
-```
-
-### 2️⃣ Create virtual environment
-
-```
 python -m venv venv
-```
-
-### 3️⃣ Activate virtual environment
-
-Linux / Mac:
-
-```
-source venv/bin/activate
-```
-
-Windows:
-
-```
-venv\Scripts\activate
-```
-
-### 4️⃣ Install dependencies
-
-```
+source venv/bin/activate   # Linux / Mac
+venv\Scripts\activate      # Windows
 pip install -r requirements.txt
-```
-
-### 5️⃣ Run backend server
-
-```
 uvicorn app.main:app --reload
 ```
 
-Backend runs at:
-
+API:
 ```
 http://127.0.0.1:8000
 ```
 
 Swagger Docs:
-
 ```
 http://127.0.0.1:8000/docs
 ```
 
 ---
 
-# 🔹 Frontend Setup (React + Vite)
+## 🔹 Frontend
 
-Open a new terminal.
-
-### 1️⃣ Navigate to frontend folder
-
-```
+```bash
 cd frontend
-```
-
-### 2️⃣ Install dependencies
-
-```
 npm install
-```
-
-### 3️⃣ Run development server
-
-```
 npm run dev
 ```
 
-Frontend runs at:
-
+Frontend:
 ```
 http://localhost:5173
 ```
 
 ---
 
-# 🔗 Connecting Frontend to Backend
-
-Ensure `frontend/src/services/api.js` contains:
-
-```
-const BASE_URL = "http://127.0.0.1:8000";
-```
-
-If backend is deployed, replace with production API URL.
-
----
-
 # 🔐 Environment Variables
-
-Backend supports:
 
 ```
 DATABASE_URL=postgresql://user:password@host/dbname
 ```
 
-If not set, defaults to SQLite for local development.
+Defaults to SQLite if not provided.
+
+---
+
+# 📈 Key Strengths
+
+- Hybrid statistical + ML detection
+- Context-aware false positive reduction
+- Bounded suppression for safety
+- High recall (~99%)
+- Explainable investigation workflow
+- Scalable architecture
 
 ---
 
 # 📜 License
 
-This project is licensed under the MIT License.
-See the LICENSE file for details.
+MIT License
 
 ---
 
 # 👨‍💻 Author
 
-Sai Shashank
-Cybersecurity & AI Enthusiast
+Sai Shashank  
+Cybersecurity × AI  
 Building intelligent, real-world AI systems.
-
----

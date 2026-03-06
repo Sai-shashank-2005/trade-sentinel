@@ -30,7 +30,13 @@ export default function Dashboard() {
     const res = await axios.get(
       `${API}/transactions?limit=10&risk_level=High`
     );
-    setTopRisk(res.data);
+
+    // Ensure topRisk is always an array
+    const data = Array.isArray(res.data)
+      ? res.data
+      : res.data.data || res.data.transactions || [];
+
+    setTopRisk(data);
   }
 
   if (!summary)
@@ -44,10 +50,7 @@ export default function Dashboard() {
 
   const COLORS = ["#ef4444", "#facc15", "#22c55e"];
 
-  const highPercent = (
-    (summary.high / summary.total) *
-    100
-  ).toFixed(2);
+  const highPercent = ((summary.high / summary.total) * 100).toFixed(2);
 
   return (
     <div className="space-y-10">
@@ -71,16 +74,8 @@ export default function Dashboard() {
           highlight="red"
           sub={`${highPercent}% of total`}
         />
-        <KPI
-          label="Medium Risk"
-          value={summary.medium}
-          highlight="yellow"
-        />
-        <KPI
-          label="Low Risk"
-          value={summary.low}
-          highlight="green"
-        />
+        <KPI label="Medium Risk" value={summary.medium} highlight="yellow" />
+        <KPI label="Low Risk" value={summary.low} highlight="green" />
       </div>
 
       {/* DONUT + INSIGHTS */}
@@ -112,21 +107,15 @@ export default function Dashboard() {
             </ResponsiveContainer>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <p className="text-xs text-gray-400 uppercase">
-                Total
-              </p>
-              <p className="text-2xl font-bold">
-                {summary.total}
-              </p>
+              <p className="text-xs text-gray-400 uppercase">Total</p>
+              <p className="text-2xl font-bold">{summary.total}</p>
             </div>
           </div>
         </div>
 
         {/* INSIGHTS */}
         <div className="bg-gray-900 p-6 rounded-2xl shadow-lg space-y-5">
-          <h2 className="text-lg font-semibold">
-            Intelligence Insights
-          </h2>
+          <h2 className="text-lg font-semibold">Intelligence Insights</h2>
 
           <p className="text-gray-400 text-sm">
             Hybrid anomaly detection combined with contextual trade
@@ -159,22 +148,23 @@ export default function Dashboard() {
           </thead>
 
           <tbody>
-            {topRisk.map((txn) => (
-              <tr
-                key={txn.transaction_id}
-                onClick={() =>
-                  navigate(`/transactions/${txn.transaction_id}`)
-                }
-                className="border-t border-gray-800 hover:bg-gray-800 cursor-pointer transition"
-              >
-                <td className="p-3">{txn.transaction_id}</td>
-                <td className="text-red-400 font-semibold">
-                  {txn.final_risk.toFixed(2)}
-                </td>
-                <td>{txn.ai_score.toFixed(2)}</td>
-                <td>{txn.context_adjustment.toFixed(2)}</td>
-              </tr>
-            ))}
+            {Array.isArray(topRisk) &&
+              topRisk.map((txn) => (
+                <tr
+                  key={txn.transaction_id}
+                  onClick={() =>
+                    navigate(`/transactions/${txn.transaction_id}`)
+                  }
+                  className="border-t border-gray-800 hover:bg-gray-800 cursor-pointer transition"
+                >
+                  <td className="p-3">{txn.transaction_id}</td>
+                  <td className="text-red-400 font-semibold">
+                    {txn.final_risk?.toFixed(2)}
+                  </td>
+                  <td>{txn.ai_score?.toFixed(2)}</td>
+                  <td>{txn.context_adjustment?.toFixed(2)}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
@@ -196,17 +186,9 @@ function KPI({ label, value, highlight, sub }) {
 
   return (
     <div className="bg-gray-900 p-6 rounded-2xl shadow-lg hover:scale-[1.02] transition-transform">
-      <p className="text-gray-400 text-xs uppercase tracking-wider">
-        {label}
-      </p>
-      <p className={`text-2xl font-bold mt-2 ${color}`}>
-        {value}
-      </p>
-      {sub && (
-        <p className="text-xs text-gray-500 mt-1">
-          {sub}
-        </p>
-      )}
+      <p className="text-gray-400 text-xs uppercase tracking-wider">{label}</p>
+      <p className={`text-2xl font-bold mt-2 ${color}`}>{value}</p>
+      {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
     </div>
   );
 }

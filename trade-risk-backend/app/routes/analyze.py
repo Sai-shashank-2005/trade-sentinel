@@ -1,17 +1,20 @@
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import pandas as pd
 
-from app.database import SessionLocal
-from app.models import Transaction
-from app.services.feature_engineering import engineer_features
-from app.services.model import compute_ai_score
-from app.services.rule_engine import compute_rule_score
-from app.services.scoring import compute_hybrid_risk
-from app.services.context_layer import apply_context_adjustment
-from app.services.explanation_engine import generate_explanations
+from ..database import SessionLocal
+from ..models import Transaction
+from ..schemas import AnalyzeRequest
+
+from ..services.feature_engineering import engineer_features
+from ..services.rule_engine import compute_rule_score
+from ..services.model import compute_ai_score
+from ..services.scoring import compute_hybrid_risk
+from ..services.context_layer import apply_context_adjustment
+from ..services.explanation_engine import generate_explanations
 
 router = APIRouter()
+
 
 def get_db():
     db = SessionLocal()
@@ -22,68 +25,85 @@ def get_db():
 
 
 @router.post("/analyze")
-async def analyze(file: UploadFile = File(...), db: Session = Depends(get_db)):
+def analyze_transaction(data: AnalyzeRequest, db: Session = Depends(get_db)):
 
-    # Read CSV
-    df = pd.read_csv(file.file)
+    data_dict = data.dict()
 
-    # Run full intelligence pipeline
-    df = engineer_features(df)
-    df = compute_ai_score(df)
-    df = compute_rule_score(df)
-    df = compute_hybrid_risk(df)
-    df = apply_context_adjustment(df)
+    new_df = pd.DataFrame([data_dict])
 
-    # Final classification
-    risk_levels = []
-    for risk in df["final_risk"]:
-        if risk >= 75:
-            risk_levels.append("High")
-        elif risk >= 50:
-            risk_levels.append("Medium")
-        else:
-            risk_levels.append("Low")
+    new_df["route"] = (
+        new_df["origin_country"] + "-" + new_df["destination_country"]
+    )
 
-    df["final_risk_level"] = risk_levels
+    # -------------------------
+    # Load historical dataset
+    # -------------------------
 
-    df = generate_explanations(df)
+    historical = db.query(Transaction).all()
 
-    # Clear previous results (for hackathon simplicity)
-    db.query(Transaction).delete()
-    db.commit()
+    historical_df = pd.DataFrame([t.__dict__ for t in historical])
 
-    # Store into database
-    for _, row in df.iterrows():
-
-        transaction = Transaction(
-            transaction_id=row["transaction_id"],
-            raw_risk=row["raw_risk"],
-            final_risk=row["final_risk"],
-            ai_score=row["ai_score"],
-            rule_score=row["rule_score"],
-            risk_level=row["final_risk_level"],
-            context_adjustment=row["context_adjustment"],
-            price_zscore=row["price_zscore"],
-            volume_zscore=row["volume_zscore"],
-            route_frequency=row["route_frequency"],
-            counterparty_frequency=row["counterparty_frequency"],
-            price_rule_triggered=row["price_rule_triggered"],
-            volume_rule_triggered=row["volume_rule_triggered"],
-            route_rule_triggered=row["route_rule_triggered"],
-            exporter_rule_triggered=row["exporter_rule_triggered"],
-            explanation_text=row["explanation_text"]
+    if not historical_df.empty:
+        historical_df = historical_df.drop(
+            columns=["_sa_instance_state"], errors="ignore"
         )
 
-        db.add(transaction)
+    # -------------------------
+    # Combine historical + new
+    # -------------------------
 
+    combined_df = pd.concat([historical_df, new_df], ignore_index=True)
+
+    # -------------------------
+    # Feature Engineering
+    # -------------------------
+
+    combined_df = engineer_features(combined_df)
+
+    # -------------------------
+    # Rule Engine
+    # -------------------------
+
+    combined_df = compute_rule_score(combined_df)
+
+    # -------------------------
+    # AI Model
+    # -------------------------
+
+    combined_df = compute_ai_score(combined_df)
+
+    # -------------------------
+    # Hybrid Scoring
+    # -------------------------
+
+    combined_df = compute_hybrid_risk(combined_df)
+
+    # -------------------------
+    # Context Layer
+    # -------------------------
+
+    combined_df = apply_context_adjustment(combined_df)
+
+    # -------------------------
+    # Explainability
+    # -------------------------
+
+    combined_df = generate_explanations(combined_df)
+
+    # -------------------------
+    # Extract result
+    # -------------------------
+
+    result = combined_df.iloc[-1].to_dict()
+
+    # -------------------------
+    # Save transaction
+    # -------------------------
+
+    record = Transaction(**result)
+
+    db.add(record)
     db.commit()
+    db.refresh(record)
 
-    # Return summary only
-    summary = {
-        "total": len(df),
-        "high": len(df[df["final_risk_level"] == "High"]),
-        "medium": len(df[df["final_risk_level"] == "Medium"]),
-        "low": len(df[df["final_risk_level"] == "Low"]),
-    }
-
-    return summary
+    return result

@@ -1,33 +1,44 @@
-from sqlalchemy import Column, Integer, Float, String, Boolean, Text, DateTime
-from app.database import Base
+from sqlalchemy import Column, Integer, Float, String, DateTime
 from datetime import datetime
+from .database import Base
+
 
 class Transaction(Base):
 
     __tablename__ = "transactions"
 
     id = Column(Integer, primary_key=True, index=True)
-    transaction_id = Column(Integer)
 
-    raw_risk = Column(Float)
-    final_risk = Column(Float)
+    importer = Column(String)
+    exporter = Column(String)
+
+    origin_country = Column(String)
+    destination_country = Column(String)
+
+    route = Column(String)
+
+    hs_code = Column(String)
+
+    quantity = Column(Float)
+    unit_price = Column(Float)
+    total_value = Column(Float)
+
     ai_score = Column(Float)
     rule_score = Column(Float)
 
-    risk_level = Column(String)
-
-    context_adjustment = Column(Float)
-
     price_zscore = Column(Float)
     volume_zscore = Column(Float)
+
     route_frequency = Column(Float)
     counterparty_frequency = Column(Float)
 
-    price_rule_triggered = Column(Boolean)
-    volume_rule_triggered = Column(Boolean)
-    route_rule_triggered = Column(Boolean)
-    exporter_rule_triggered = Column(Boolean)
+    context_adjustment = Column(Float)
 
-    explanation_text = Column(Text)
+    raw_risk = Column(Float)
+    final_risk = Column(Float)
+
+    risk_level = Column(String)
+
+    explanation_text = Column(String)
 
     created_at = Column(DateTime, default=datetime.utcnow)

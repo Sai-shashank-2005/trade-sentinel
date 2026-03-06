@@ -6,10 +6,10 @@ def generate_explanations(df):
 
         parts = []
 
-        # --- Risk Level Intro ---
-        parts.append(f"Risk classified as {row['final_risk_level']}.")
+        # Risk level
+        parts.append(f"Final risk classification: {row['risk_level']}.")
 
-        # --- AI Signal ---
+        # AI signal
         if row["ai_score"] > 80:
             parts.append(
                 f"Strong statistical anomaly detected (AI score {row['ai_score']:.2f})."
@@ -19,33 +19,49 @@ def generate_explanations(df):
                 f"Moderate statistical deviation observed (AI score {row['ai_score']:.2f})."
             )
 
-        # --- Rule Triggers ---
-        if row["price_rule_triggered"]:
+        # Price anomaly
+        if abs(row["price_zscore"]) > 5:
             parts.append(
-                f"Significant price deviation (z-score {row['price_zscore']:.2f})."
+                f"Extreme price deviation (z-score {row['price_zscore']:.2f})."
+            )
+        elif abs(row["price_zscore"]) > 3:
+            parts.append(
+                f"Price deviation detected (z-score {row['price_zscore']:.2f})."
             )
 
-        if row["volume_rule_triggered"]:
+        # Volume anomaly
+        if abs(row["volume_zscore"]) > 5:
             parts.append(
-                f"Unusual trade volume (z-score {row['volume_zscore']:.2f})."
+                f"Extreme volume anomaly (z-score {row['volume_zscore']:.2f})."
+            )
+        elif abs(row["volume_zscore"]) > 3:
+            parts.append(
+                f"Volume deviation detected (z-score {row['volume_zscore']:.2f})."
             )
 
-        if row["route_rule_triggered"]:
-            parts.append("Rare trade route identified.")
+        # Route rarity
+        if row["route_frequency"] < 0.01:
+            parts.append("Rare trade route observed.")
 
-        if row["exporter_rule_triggered"]:
+        # Exporter rarity
+        if row["counterparty_frequency"] < 0.01:
             parts.append("Low-frequency exporter involved.")
 
-        # --- Context Adjustment ---
+        # Context adjustment
         if row["context_adjustment"] < 0:
-            parts.append("Risk adjusted downward due to stable historical patterns.")
+            parts.append(
+                "Risk reduced due to stable historical trade behavior."
+            )
 
-        # --- Fallback ---
-        if len(parts) == 1:  # only risk intro exists
-            parts.append("Transaction falls within normal behavioral thresholds.")
+        # Fallback
+        if len(parts) == 1:
+            parts.append(
+                "Transaction falls within expected behavioral thresholds."
+            )
 
-        explanation_text = " ".join(parts)
-        explanations.append(explanation_text)
+        explanation = " ".join(parts)
+
+        explanations.append(explanation)
 
     df["explanation_text"] = explanations
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, cast, String
+from sqlalchemy import cast, String
 
 from app.database import SessionLocal
 from app.models import Transaction
@@ -16,7 +16,9 @@ def get_db():
         db.close()
 
 
-# ================= GET TRANSACTIONS =================
+# -------------------------------
+# GET ALL TRANSACTIONS
+# -------------------------------
 
 @router.get("/transactions")
 def get_transactions(
@@ -29,26 +31,17 @@ def get_transactions(
 
     query = db.query(Transaction)
 
-    # GLOBAL SEARCH
+    # Search by transaction ID
     if search:
-
-        term = f"%{search}%"
-
         query = query.filter(
-            or_(
-                cast(Transaction.transaction_id, String).ilike(term),
-                cast(Transaction.id, String).ilike(term),
-                Transaction.importer.ilike(term),
-                Transaction.exporter.ilike(term),
-                Transaction.route.ilike(term),
-                Transaction.origin_country.ilike(term),
-                Transaction.destination_country.ilike(term),
-            )
+            cast(Transaction.transaction_id, String).contains(search)
         )
 
-    if risk_level:
+    # Filter by risk level
+    if risk_level and risk_level != "All":
         query = query.filter(Transaction.risk_level == risk_level)
 
+    # Newest first
     query = query.order_by(Transaction.id.desc())
 
     results = query.offset(offset).limit(limit).all()
@@ -56,16 +49,18 @@ def get_transactions(
     return results
 
 
-# ================= TRANSACTION DETAIL =================
+# -------------------------------
+# GET SINGLE TRANSACTION
+# -------------------------------
 
-@router.get("/transactions/{id}")
+@router.get("/transactions/{transaction_id}")
 def get_transaction_detail(
-    id: int,
+    transaction_id: int,
     db: Session = Depends(get_db)
 ):
 
     transaction = db.query(Transaction).filter(
-        Transaction.id == id
+        Transaction.transaction_id == transaction_id
     ).first()
 
     return transaction

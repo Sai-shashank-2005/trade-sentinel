@@ -7,19 +7,22 @@ export default function LiveTrade() {
 
   const [form, setForm] = useState({
     transaction_id: "",
-    date: "",
-    importer: "",
-    exporter: "",
     hs_code: "",
     quantity: "",
     unit_price: "",
-    origin_country: "",
-    destination_country: "",
+    exporter: "",
     route: ""
   });
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+
+  function updateField(field, value) {
+    setForm({
+      ...form,
+      [field]: value
+    });
+  }
 
   async function submitTrade() {
 
@@ -28,10 +31,18 @@ export default function LiveTrade() {
       setLoading(true);
 
       const payload = {
-        ...form,
         transaction_id: Number(form.transaction_id),
+        hs_code: Number(form.hs_code),
         quantity: Number(form.quantity),
-        unit_price: Number(form.unit_price)
+        unit_price: Number(form.unit_price),
+        exporter: form.exporter,
+        route: form.route,
+
+        // auto fields
+        date: new Date().toISOString(),
+        importer: "LiveImporter",
+        origin_country: "USA",
+        destination_country: "Germany"
       };
 
       const res = await axios.post(`${API}/live-trade`, payload);
@@ -50,48 +61,40 @@ export default function LiveTrade() {
     setLoading(false);
   }
 
-  function updateField(field, value) {
-    setForm({
-      ...form,
-      [field]: value
-    });
-  }
-
   return (
     <div className="space-y-10">
 
-      {/* HEADER */}
       <div className="bg-gray-900 p-8 rounded-2xl shadow-xl">
         <h1 className="text-4xl font-bold">
           Live Trade Intelligence Monitor
         </h1>
         <p className="text-gray-400 mt-2 text-sm">
-          Inject a trade and evaluate risk in real-time
+          Inject trade data and analyze risk instantly
         </p>
       </div>
 
-      {/* FORM */}
       <div className="grid grid-cols-2 gap-6 bg-gray-900 p-8 rounded-2xl">
 
         {Object.keys(form).map((key) => (
+
           <div key={key} className="space-y-2">
 
             <label className="text-sm text-gray-400">
-              {key.replace("_", " ").toUpperCase()}
+              {key.replace("_"," ").toUpperCase()}
             </label>
 
             <input
               value={form[key]}
               onChange={(e) => updateField(key, e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 px-4 py-2 rounded-lg focus:outline-none focus:border-blue-500"
+              className="w-full bg-gray-800 border border-gray-700 px-4 py-2 rounded-lg"
             />
 
           </div>
+
         ))}
 
       </div>
 
-      {/* BUTTON */}
       <button
         onClick={submitTrade}
         className="bg-blue-500 hover:bg-blue-600 px-6 py-3 rounded-xl font-semibold"
@@ -99,7 +102,6 @@ export default function LiveTrade() {
         {loading ? "Analyzing..." : "Analyze Trade"}
       </button>
 
-      {/* RESULT */}
       {result && (
         <div className="bg-gray-900 p-6 rounded-2xl">
 
@@ -109,6 +111,10 @@ export default function LiveTrade() {
 
           <p className="text-gray-300">
             Risk Level: <span className="font-bold">{result.risk}</span>
+          </p>
+
+          <p className="text-gray-400 text-sm mt-2">
+            Risk Score: {result.score?.toFixed(2)}
           </p>
 
         </div>

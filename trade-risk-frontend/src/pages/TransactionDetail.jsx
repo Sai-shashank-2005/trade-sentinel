@@ -5,6 +5,7 @@ import axios from "axios";
 const API = import.meta.env.VITE_API_URL;
 
 export default function TransactionDetail() {
+
   const { id } = useParams();
   const [txn, setTxn] = useState(null);
 
@@ -38,14 +39,14 @@ export default function TransactionDetail() {
       {/* ================= HERO ================= */}
       <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-2xl shadow-xl grid grid-cols-3 items-center">
 
-        {/* LEFT - Risk */}
+        {/* LEFT */}
         <div className="col-span-2">
           <p className="text-xs text-gray-400 uppercase tracking-wider">
             Final Risk Score
           </p>
 
           <p
-            className={`text-4xl md:text-5xl font-bold mt-2 ${
+            className={`text-5xl font-bold mt-2 ${
               txn.risk_level === "High"
                 ? "text-red-400"
                 : txn.risk_level === "Medium"
@@ -53,7 +54,7 @@ export default function TransactionDetail() {
                 : "text-green-400"
             }`}
           >
-            {txn.final_risk.toFixed(2)}
+            {txn.final_risk?.toFixed(2)}
           </p>
 
           <span
@@ -76,21 +77,51 @@ export default function TransactionDetail() {
           </div>
         </div>
 
-        {/* RIGHT - Metrics */}
-        <div className="col-span-1 text-right space-y-6 border-l border-gray-800 pl-8">
-          <Metric label="AI Score" value={txn.ai_score.toFixed(2)} />
-          <Metric label="Rule Score" value={txn.rule_score.toFixed(2)} />
+        {/* RIGHT */}
+        <div className="text-right space-y-6 border-l border-gray-800 pl-8">
+          <Metric label="AI Score" value={txn.ai_score?.toFixed(2)} />
+          <Metric label="Rule Score" value={txn.rule_score?.toFixed(2)} />
           <Metric
             label="Context Adjustment"
-            value={txn.context_adjustment.toFixed(2)}
+            value={txn.context_adjustment?.toFixed(2)}
           />
         </div>
       </div>
 
-      {/* ================= INTELLIGENCE GRID ================= */}
-      <div className="grid grid-cols-2 gap-6 items-start">
 
-        {/* LEFT COLUMN */}
+      {/* ================= TRADE DATA ================= */}
+      <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
+
+        <p className="text-xs text-gray-500 uppercase tracking-wider mb-4">
+          Trade Intelligence Snapshot
+        </p>
+
+        <div className="grid grid-cols-4 gap-6 text-sm">
+
+          <Data label="Date" value={txn.date} />
+          <Data label="Importer" value={txn.importer} />
+          <Data label="Exporter" value={txn.exporter} />
+          <Data label="HS Code" value={txn.hs_code} />
+
+          <Data label="Quantity" value={txn.quantity?.toFixed(2)} />
+          <Data label="Unit Price" value={txn.unit_price?.toFixed(2)} />
+          <Data label="Total Value" value={txn.total_value?.toFixed(2)} />
+
+          <Data label="Origin Country" value={txn.origin_country} />
+          <Data label="Destination Country" value={txn.destination_country} />
+          <Data label="Trade Route" value={txn.route} />
+
+          <Data label="Dataset Source" value={txn.dataset_name || "Live Trade"} />
+          <Data label="Ingestion Type" value={txn.source} />
+
+        </div>
+      </div>
+
+
+      {/* ================= INTELLIGENCE GRID ================= */}
+      <div className="grid grid-cols-2 gap-6">
+
+        {/* LEFT */}
         <div className="space-y-6">
 
           <Card title="Model Contribution">
@@ -114,9 +145,11 @@ export default function TransactionDetail() {
               value={txn.counterparty_frequency * 20}
             />
           </Card>
+
         </div>
 
-        {/* RIGHT COLUMN */}
+
+        {/* RIGHT */}
         <div className="space-y-6">
 
           <Card title="Rule Triggers">
@@ -126,7 +159,8 @@ export default function TransactionDetail() {
             <Rule label="Exporter Rule" value={txn.exporter_rule_triggered} />
           </Card>
 
-          <div className="bg-gray-900 p-6 rounded-2xl shadow-lg h-full text-center">
+          <div className="bg-gray-900 p-6 rounded-2xl shadow-lg text-center">
+
             <p className="text-xs text-gray-400 uppercase tracking-wider">
               Model Confidence
             </p>
@@ -138,12 +172,17 @@ export default function TransactionDetail() {
             <p className="text-xs text-gray-500 mt-2">
               Calibrated hybrid intelligence confidence
             </p>
+
           </div>
+
         </div>
+
       </div>
 
+
       {/* ================= EXPLAINABLE AI ================= */}
-      <div className="bg-gray-900 p-5 rounded-2xl shadow-lg">
+      <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
+
         <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">
           Explainable AI Output
         </p>
@@ -152,13 +191,16 @@ export default function TransactionDetail() {
           Automated Risk Interpretation
         </h2>
 
-        <p className="text-gray-400 leading-relaxed text-sm">
+        <p className="text-gray-400 text-sm leading-relaxed">
           {txn.explanation_text}
         </p>
+
       </div>
+
     </div>
   );
 }
+
 
 /* ================= COMPONENTS ================= */
 
@@ -173,6 +215,7 @@ function Metric({ label, value }) {
   );
 }
 
+
 function Card({ title, children }) {
   return (
     <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
@@ -182,7 +225,9 @@ function Card({ title, children }) {
   );
 }
 
+
 function Progress({ label, value }) {
+
   const safe = Math.min(Math.max(value, 0), 100);
 
   return (
@@ -191,6 +236,7 @@ function Progress({ label, value }) {
         <span>{label}</span>
         <span>{safe.toFixed(2)}</span>
       </div>
+
       <div className="w-full bg-gray-800 h-2 rounded-full">
         <div
           className="bg-blue-500 h-2 rounded-full transition-all"
@@ -201,6 +247,7 @@ function Progress({ label, value }) {
   );
 }
 
+
 function Rule({ label, value }) {
   return (
     <div className="flex justify-between text-sm mb-2">
@@ -208,6 +255,20 @@ function Rule({ label, value }) {
       <span className={value ? "text-red-400" : "text-green-400"}>
         {value ? "Triggered" : "Not Triggered"}
       </span>
+    </div>
+  );
+}
+
+
+function Data({ label, value }) {
+  return (
+    <div>
+      <p className="text-xs text-gray-400 uppercase tracking-wide">
+        {label}
+      </p>
+      <p className="text-sm mt-1 font-medium text-gray-200">
+        {value || "-"}
+      </p>
     </div>
   );
 }

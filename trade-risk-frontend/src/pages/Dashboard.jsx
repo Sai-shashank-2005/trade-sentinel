@@ -175,7 +175,7 @@ export default function Dashboard() {
             Risk Distribution
           </h2>
 
-          <div className="h-80">
+          <div className="h-80 relative">
 
   <ResponsiveContainer>
 
@@ -184,7 +184,7 @@ export default function Dashboard() {
       <defs>
         <linearGradient id="highRisk" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#ef4444"/>
-          <stop offset="100%" stopColor="#b91c1c"/>
+          <stop offset="100%" stopColor="#991b1b"/>
         </linearGradient>
 
         <linearGradient id="medRisk" x1="0" y1="0" x2="1" y2="1">
@@ -201,19 +201,23 @@ export default function Dashboard() {
       <Pie
         data={riskDistribution}
         dataKey="value"
-        innerRadius={80}
+        innerRadius={85}
         outerRadius={120}
         paddingAngle={3}
+        stroke="#0f172a"
+        strokeWidth={2}
       >
+
         <Cell fill="url(#highRisk)" />
         <Cell fill="url(#medRisk)" />
         <Cell fill="url(#lowRisk)" />
+
       </Pie>
 
       <Tooltip
         contentStyle={{
-          background: "#0f172a",
-          border: "1px solid #1f2937",
+          background: "#020617",
+          border: "1px solid #1e293b",
           borderRadius: "8px",
           color: "#fff"
         }}
@@ -223,8 +227,26 @@ export default function Dashboard() {
 
   </ResponsiveContainer>
 
-</div>
 
+  {/* CENTER METRIC */}
+
+  <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+
+    <p className="text-xs text-gray-400 uppercase">
+      Total Trades
+    </p>
+
+    <p className="text-3xl font-bold text-white">
+      {summary.total}
+    </p>
+
+    <p className="text-xs text-gray-500">
+      monitored
+    </p>
+
+  </div>
+
+</div>
         </div>
 
 
@@ -306,7 +328,7 @@ export default function Dashboard() {
 
           <div
             key={a.id}
-            onClick={() => navigate(`/transactions/${a.id}`)}
+            onClick={() => navigate(`/transactions/${a.transaction_id}`)}
             className="flex justify-between border-b border-gray-800 py-2 cursor-pointer hover:text-white"
           >
 
@@ -350,23 +372,22 @@ export default function Dashboard() {
             {topRisk.map((txn) => (
 
               <tr
-                key={txn.id}
-                onClick={() => navigate(`/transactions/${txn.id}`)}
-                className="border-t border-gray-800 hover:bg-gray-800 cursor-pointer"
-              >
+  key={txn.id}
+  onClick={() => navigate(`/transactions/${txn.transaction_id}`)}
+  className="border-t border-gray-800 hover:bg-gray-800 cursor-pointer"
+>
 
-                <td className="p-3">{txn.transaction_id}</td>
+  <td className="p-3">{txn.transaction_id}</td>
 
-                <td className="text-red-400 font-semibold">
-                  {txn.final_risk.toFixed(2)}
-                </td>
+  <td className="text-red-400 font-semibold">
+    {txn.final_risk.toFixed(2)}
+  </td>
 
-                <td>{txn.ai_score.toFixed(2)}</td>
+  <td>{txn.ai_score.toFixed(2)}</td>
 
-                <td>{txn.context_adjustment.toFixed(2)}</td>
+  <td>{txn.context_adjustment.toFixed(2)}</td>
 
-              </tr>
-
+</tr>
             ))}
 
           </tbody>

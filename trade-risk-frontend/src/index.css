@@ -1,1 +1,34 @@
 @import "tailwindcss";
+@media print {
+
+aside{
+display:none;
+}
+
+.print\:hidden{
+display:none;
+}
+
+body{
+background:white;
+color:black;
+}
+
+#print-report{
+display:block;
+padding:40px;
+font-family:Arial;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+td{
+border:1px solid #ddd;
+padding:8px;
+}
+
+}

@@ -9,6 +9,9 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  PieChart,
+  Pie,
+  Cell,
 } from "recharts";
 
 const API = import.meta.env.VITE_API_URL;
@@ -34,26 +37,29 @@ export default function Dashboard() {
 
   async function fetchTransactions() {
     const res = await axios.get(`${API}/transactions?limit=500`);
-    const txns = res.data;
+    const txns = res.data || [];
+
+    if (txns.length === 0) return;
 
     /* GLOBAL RISK INDEX */
+
     const avg =
-      txns.reduce((sum, t) => sum + t.final_risk, 0) / txns.length;
+      txns.reduce((sum, t) => sum + (t.final_risk || 0), 0) / txns.length;
 
     setRiskIndex(avg.toFixed(1));
 
-    /* ROUTE RISK INTELLIGENCE */
+    /* ROUTE RISK */
 
     const routeMap = {};
 
     txns.forEach((t) => {
-      const r = t.route;
+      const r = t.route || "UNKNOWN";
 
       if (!routeMap[r]) {
         routeMap[r] = { route: r, total: 0, count: 0 };
       }
 
-      routeMap[r].total += t.final_risk;
+      routeMap[r].total += t.final_risk || 0;
       routeMap[r].count++;
     });
 
@@ -77,7 +83,7 @@ export default function Dashboard() {
 
     /* TOP RISK */
 
-    const top = txns
+    const top = [...txns]
       .sort((a, b) => b.final_risk - a.final_risk)
       .slice(0, 10);
 
@@ -89,45 +95,46 @@ export default function Dashboard() {
 
   const highPercent = ((summary.high / summary.total) * 100).toFixed(2);
 
+  const riskDistribution = [
+    { name: "High", value: summary.high },
+    { name: "Medium", value: summary.medium },
+    { name: "Low", value: summary.low },
+  ];
+
+  const COLORS = ["#ef4444", "#facc15", "#22c55e"];
+
   return (
     <div className="space-y-10">
 
-      {/* HEADER */}
+      {/* INTELLIGENCE HEADER */}
 
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-2xl shadow-xl">
-        <h1 className="text-4xl font-bold">
-          Global Trade Risk Intelligence
-        </h1>
-
-        <p className="text-gray-400 text-sm mt-2">
-          AI-driven anomaly detection monitoring international trade flows
-        </p>
-      </div>
-
-
-      {/* GLOBAL RISK INDEX */}
-
-      <div className="bg-gray-900 p-6 rounded-2xl shadow-lg flex justify-between">
+      <div className="bg-gradient-to-r from-gray-900 to-gray-800 p-8 rounded-2xl shadow-xl flex justify-between">
 
         <div>
+          <h1 className="text-4xl font-bold">
+            Global Trade Risk Intelligence
+          </h1>
+
+          <p className="text-gray-400 text-sm mt-2">
+            AI-driven anomaly detection across international trade flows
+          </p>
+        </div>
+
+        <div className="text-right">
           <p className="text-xs text-gray-400 uppercase">
             Global Risk Index
           </p>
 
-          <p className="text-4xl font-bold text-blue-400 mt-2">
+          <p className="text-4xl font-bold text-blue-400">
             {riskIndex}
           </p>
 
-          <p className="text-gray-400 text-sm">
-            Aggregated intelligence from recent trade flows
+          <p className="text-xs text-gray-500">
+            Hybrid AI + Rule + Context scoring
           </p>
         </div>
 
-        <div className="text-right text-sm text-gray-500">
-          Hybrid AI + Rule + Context scoring
-        </div>
       </div>
-
 
       {/* KPI GRID */}
 
@@ -136,64 +143,92 @@ export default function Dashboard() {
         <KPI label="Total Transactions" value={summary.total} />
 
         <KPI
-          label="High Risk"
+          label="High Risk Alerts"
           value={summary.high}
-          sub={`${highPercent}% flagged`}
           color="text-red-400"
+          sub={`${highPercent}% flagged`}
         />
 
         <KPI
-          label="Medium Risk"
+          label="Medium Risk Monitoring"
           value={summary.medium}
           color="text-yellow-400"
         />
 
         <KPI
-          label="Low Risk"
+          label="Safe Trade Volume"
           value={summary.low}
           color="text-green-400"
         />
 
       </div>
 
-
-      {/* RISK EXPOSURE + ROUTE RISK */}
+      {/* RISK DISTRIBUTION + ROUTE RISK */}
 
       <div className="grid grid-cols-2 gap-6">
 
-        {/* RISK EXPOSURE */}
+        {/* RISK DISTRIBUTION */}
 
         <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
 
           <h2 className="text-lg font-semibold mb-4">
-            Risk Exposure
+            Risk Distribution
           </h2>
 
-          <div className="space-y-4">
+          <div className="h-80">
 
-            <Exposure
-              label="High Risk Investigations"
-              value={summary.high}
-              color="text-red-400"
-            />
+  <ResponsiveContainer>
 
-            <Exposure
-              label="Medium Risk Monitoring"
-              value={summary.medium}
-              color="text-yellow-400"
-            />
+    <PieChart>
 
-            <Exposure
-              label="Safe Trade Volume"
-              value={summary.low}
-              color="text-green-400"
-            />
+      <defs>
+        <linearGradient id="highRisk" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ef4444"/>
+          <stop offset="100%" stopColor="#b91c1c"/>
+        </linearGradient>
 
-          </div>
+        <linearGradient id="medRisk" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#facc15"/>
+          <stop offset="100%" stopColor="#ca8a04"/>
+        </linearGradient>
+
+        <linearGradient id="lowRisk" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#22c55e"/>
+          <stop offset="100%" stopColor="#15803d"/>
+        </linearGradient>
+      </defs>
+
+      <Pie
+        data={riskDistribution}
+        dataKey="value"
+        innerRadius={80}
+        outerRadius={120}
+        paddingAngle={3}
+      >
+        <Cell fill="url(#highRisk)" />
+        <Cell fill="url(#medRisk)" />
+        <Cell fill="url(#lowRisk)" />
+      </Pie>
+
+      <Tooltip
+        contentStyle={{
+          background: "#0f172a",
+          border: "1px solid #1f2937",
+          borderRadius: "8px",
+          color: "#fff"
+        }}
+      />
+
+    </PieChart>
+
+  </ResponsiveContainer>
+
+</div>
+
         </div>
 
 
-        {/* ROUTE HEATMAP */}
+        {/* ROUTE RISK */}
 
         <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
 
@@ -203,30 +238,55 @@ export default function Dashboard() {
 
           <div className="h-80">
 
-            <ResponsiveContainer>
+  <ResponsiveContainer>
 
-              <BarChart data={routeRisk}>
+    <BarChart data={routeRisk}>
 
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+      <defs>
+        <linearGradient id="routeGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#60a5fa"/>
+          <stop offset="100%" stopColor="#1d4ed8"/>
+        </linearGradient>
+      </defs>
 
-                <XAxis dataKey="route" stroke="#aaa" />
+      <CartesianGrid strokeDasharray="4 4" stroke="#1f2937" />
 
-                <YAxis stroke="#aaa" />
+      <XAxis
+        dataKey="route"
+        stroke="#94a3b8"
+        tick={{ fontSize: 12 }}
+      />
 
-                <Tooltip />
+      <YAxis
+        stroke="#94a3b8"
+        tick={{ fontSize: 12 }}
+      />
 
-                <Bar dataKey="risk" fill="#3b82f6" />
+      <Tooltip
+        contentStyle={{
+          background: "#0f172a",
+          border: "1px solid #1f2937",
+          borderRadius: "8px",
+          color: "#fff"
+        }}
+      />
 
-              </BarChart>
+      <Bar
+        dataKey="risk"
+        fill="url(#routeGradient)"
+        radius={[6,6,0,0]}
+        barSize={45}
+      />
 
-            </ResponsiveContainer>
+    </BarChart>
 
-          </div>
+  </ResponsiveContainer>
+
+</div>
 
         </div>
 
       </div>
-
 
       {/* ALERT FEED */}
 
@@ -250,7 +310,9 @@ export default function Dashboard() {
             className="flex justify-between border-b border-gray-800 py-2 cursor-pointer hover:text-white"
           >
 
-            <span>Txn {a.transaction_id}</span>
+            <span>
+              Txn {a.transaction_id} • {a.route}
+            </span>
 
             <span className="text-red-400">
               {a.final_risk.toFixed(2)}
@@ -261,7 +323,6 @@ export default function Dashboard() {
         ))}
 
       </div>
-
 
       {/* TOP HIGH RISK */}
 
@@ -318,7 +379,6 @@ export default function Dashboard() {
   );
 }
 
-
 function KPI({ label, value, color, sub }) {
   return (
     <div className="bg-gray-900 p-6 rounded-2xl shadow-lg">
@@ -327,15 +387,6 @@ function KPI({ label, value, color, sub }) {
         {value}
       </p>
       {sub && <p className="text-xs text-gray-500 mt-1">{sub}</p>}
-    </div>
-  );
-}
-
-function Exposure({ label, value, color }) {
-  return (
-    <div className="flex justify-between border-b border-gray-800 pb-2">
-      <span>{label}</span>
-      <span className={`font-semibold ${color}`}>{value}</span>
     </div>
   );
 }

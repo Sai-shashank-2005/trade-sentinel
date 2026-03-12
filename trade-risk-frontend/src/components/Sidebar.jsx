@@ -57,6 +57,7 @@ export default function Sidebar() {
             label="Live Monitor"
             icon={<Activity size={18} />}
           />
+          
 
         </nav>
       </div>

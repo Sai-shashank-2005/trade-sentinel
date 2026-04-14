@@ -1,353 +1,232 @@
-# 🚀 Trade Sentinel AI v2.5
+# Trade Sentinel AI v2.5
 
-## Context‑Aware Hybrid Trade Risk Intelligence Platform
+## Context-Aware Hybrid Trade Risk Intelligence Platform
 
-Trade Sentinel AI is a full‑stack anomaly detection platform designed to identify suspicious international trade transactions while reducing false positives using contextual behavioral calibration.
+Trade Sentinel AI is a full-stack anomaly detection platform designed to identify suspicious international trade transactions while reducing false positives through contextual behavioral calibration.
 
-The platform combines **machine learning**, **statistical anomaly detection**, **rule‑based intelligence**, and **contextual risk adjustment** to produce explainable trade risk assessments suitable for real‑world compliance and monitoring systems.
+The platform combines machine learning, statistical anomaly detection, rule-based intelligence, and context-aware calibration to generate explainable trade risk assessments suitable for real-world compliance systems.
 
----
+## Overview
 
-# 🧠 Project Overview
+Trade-based fraud such as over-invoicing, under-invoicing, abnormal routing, and suspicious counterparties is difficult to detect using traditional rule-based systems.
 
-Trade‑based fraud such as:
+Legacy systems typically suffer from high false positives, static detection logic, and limited explainability. This project introduces a hybrid intelligence architecture that improves detection accuracy while maintaining operational efficiency.
 
-* Over‑invoicing
-* Under‑invoicing
-* Abnormal trade routing
-* Suspicious counterparties
+## Key Features (v2.5)
 
-is difficult to detect using traditional rule‑based monitoring systems.
-
-Legacy monitoring tools often suffer from:
-
-* High false‑positive rates
-* Alert fatigue for investigators
-* Static detection logic
-* Limited explainability
-
-Trade Sentinel AI introduces a **hybrid intelligence architecture** that combines statistical modeling, machine learning, deterministic rules, and contextual calibration to improve detection accuracy while maintaining operational efficiency.
-
----
-
-# ✨ Major Features (v2.5)
-
-## ⚡ Live Trade Intelligence Monitor
-
-Version 2.5 introduces a **real‑time trade injection system** allowing analysts to simulate suspicious transactions and evaluate risk instantly.
-
-Capabilities:
+### Live Trade Intelligence Monitor
 
 * Manual trade transaction injection
-* Real‑time hybrid risk evaluation
+* Real-time hybrid risk evaluation
 * Immediate anomaly detection
 * Investigation workflow initiation
 
-This feature enables dynamic testing of fraud scenarios and real‑time monitoring.
+### Risk Intelligence Dashboard
 
----
+* Transaction metrics and high-risk alerts
+* Risk distribution and concentration analysis
+* Global risk index and activity feed
 
-## 📊 Advanced Risk Intelligence Dashboard
+### Investigation Engine
 
-The platform provides a global overview of trade activity and anomaly signals including:
-
-* Total transaction metrics
-* High‑risk alert tracking
-* Risk distribution visualization
-* Risk concentration by trade route
-* Global risk index
-* Real‑time trade activity feed
-
-These insights help analysts quickly identify abnormal patterns across trade flows.
-
----
-
-## 🔎 Investigation Intelligence Engine
-
-The **Transaction Detail Investigation Interface** provides explainable risk analysis.
-
-Each investigation includes:
-
-* Final hybrid risk score
-* AI anomaly score
-* Rule engine score
-* Context adjustment impact
-* Trade metadata (HS code, route, counterparties)
+* Hybrid risk score (AI + rules + context)
 * Statistical anomaly signals
 * Model contribution breakdown
 * Rule trigger indicators
-* Investigation explanation summary
-* Model confidence indicator
+* Explainable investigation summary
 
-This transforms the platform into a **full trade investigation console**.
+### Persistent Storage
 
----
-
-## 💾 Persistent Risk Intelligence Storage
-
-Version 2.5 introduces persistent transaction storage.
-
-Benefits include:
-
-* Historical investigation records
+* Historical transaction records
 * Stored anomaly analysis
-* Long‑term monitoring
-* Searchable trade intelligence database
+* Searchable intelligence database
 
----
+### Transaction Console
 
-## 🔍 Transaction Intelligence Console
+* Transaction search and filtering
+* Risk classification inspection
+* Investigation launching interface
 
-Investigators can:
+## Performance Metrics
 
-* Search transactions
-* Filter risk classifications
-* Inspect anomaly scores
-* Launch detailed investigations
+* Reduced false positives from **5,333 → 418 (~92% reduction)**
+* Maintained **~99% recall**
+* Improved precision from **~33% → 88%** after context-aware calibration
+* Validated on **100,000+ transactions**
 
-This acts as a centralized investigation interface for trade monitoring.
+## Key Insight
 
----
+Initial hybrid modeling prioritized high recall, which caused precision to drop significantly (~33%).
 
-# 🧠 Hybrid Detection Architecture
+A context-aware calibration layer was engineered to reduce false positives without suppressing high-risk alerts, recovering precision while maintaining recall.
+
+## Architecture
 
 ```
 Trade Data
      ↓
 Feature Engineering
      ↓
-Isolation Forest (AI Anomaly Score)
+Isolation Forest (AI Score)
      ↓
 Rule Engine (Compliance Signals)
      ↓
 Hybrid Risk Model
      ↓
-Context‑Aware Calibration
+Context Calibration
      ↓
 Final Risk Score
      ↓
-Explainable Investigation Dashboard
+Investigation Interface
 ```
 
----
+## Core Components
 
-# 🔬 Core Detection Components
+### Feature Engineering
 
-## Feature Engineering
-
-Category‑aware statistical normalization is applied to avoid global bias.
-
-Features include:
-
-* Price Z‑Score grouped by HS code
-* Volume Z‑Score
+* Price Z-score grouped by HS code
+* Volume Z-score grouped by HS code
 * Trade route frequency
 * Counterparty frequency
 
-This ensures anomaly detection is **context‑aware and product‑specific**.
+Ensures context-aware and product-specific anomaly detection.
 
----
+### AI Model (Isolation Forest)
 
-## AI Model — Isolation Forest
+* Unsupervised anomaly detection
+* No labeled dataset required
+* Efficient for high-dimensional data
 
-The system uses **Isolation Forest** for unsupervised anomaly detection.
+### Rule Engine
 
-Key properties:
+| Condition     | Score |
+| ------------- | ----- |
+| Price Z > 5   | +40   |
+| Price Z > 3   | +30   |
+| Volume Z > 5  | +30   |
+| Volume Z > 3  | +20   |
+| Rare Route    | +20   |
+| Rare Exporter | +10   |
 
-* Multi‑dimensional anomaly detection
-* No labeled fraud dataset required
-* Efficient for large datasets
+Score capped at 100.
 
-Anomalies require fewer partitions in isolation trees, producing higher anomaly scores.
-
----
-
-## Rule‑Based Compliance Engine
-
-A deterministic rule engine simulates regulatory checks.
-
-Example rules:
-
-| Condition        | Score |
-| ---------------- | ----- |
-| Price Z > 5      | +40   |
-| Price Z > 3      | +30   |
-| Volume Z > 5     | +30   |
-| Volume Z > 3     | +20   |
-| Rare Trade Route | +20   |
-| Rare Exporter    | +10   |
-
-Rule score capped at **100**.
-
----
-
-## Hybrid Risk Fusion
-
-Machine learning signals and rule‑based indicators are combined.
+### Hybrid Risk Model
 
 ```
-raw_risk = 0.6 × ai_score + 0.4 × rule_score
+raw_risk = 0.6 * ai_score + 0.4 * rule_score
 ```
 
-Risk classification:
+| Level  | Score |
+| ------ | ----- |
+| High   | ≥ 75  |
+| Medium | ≥ 50  |
+| Low    | < 50  |
 
-| Risk Level | Score |
-| ---------- | ----- |
-| High       | ≥ 75  |
-| Medium     | ≥ 50  |
-| Low        | < 50  |
+### Context Calibration
 
----
-
-## Context‑Aware Calibration
-
-The context layer reduces false positives while preserving high‑risk alerts.
-
-Rules:
-
-* High‑risk alerts are never suppressed
-* Medium/low alerts may be reduced if trade behavior is stable
-* Suppression capped at **20%**
+* High-risk alerts are never suppressed
+* Medium/low risk adjusted based on behavioral stability
+* Suppression capped at 20%
 
 ```
-FinalRisk = RawRisk × ContextFactor
-ContextFactor ∈ [0.8 , 1.0]
+FinalRisk = RawRisk * ContextFactor
+ContextFactor ∈ [0.8, 1.0]
 ```
 
----
+## Interface
 
-# 📊 Platform Interface
-
-## Risk Intelligence Dashboard
+### Risk Intelligence Dashboard
 
 ![Dashboard](assets/dashboard.png)
 
----
-
-## Transaction Intelligence Console
+### Transaction Intelligence Console
 
 ![Transactions](assets/transactions.png)
 
----
-
-## Investigation Detail View
+### Investigation Detail View
 
 ![Investigation](assets/investigation.png)
 
----
-
-## Live Trade Intelligence Monitor
+### Live Trade Intelligence Monitor
 
 ![Live Monitor](assets/live-monitor.png)
 
----
+## Tech Stack
 
-# ⚙️ Technology Stack
+### Backend
 
-## Backend
+FastAPI, SQLAlchemy, Pandas, NumPy, Scikit-learn, SQLite/PostgreSQL
 
-* FastAPI
-* SQLAlchemy
-* Pandas
-* NumPy
-* Scikit‑learn
-* SQLite / PostgreSQL
+### Frontend
 
-## Frontend
+React, Vite, Tailwind CSS, Recharts, React Router
 
-* React
-* Vite
-* Tailwind CSS
-* Recharts
-* React Router
-
----
-
-# 🏗 Project Structure
+## Project Structure
 
 ```
-Trade‑Sentinel‑AI
+Trade-Sentinel-AI
 │
-├── trade‑risk‑backend
-│   └── app
-│
-├── trade‑risk‑frontend
-│
+├── trade-risk-backend
+├── trade-risk-frontend
 ├── assets
-│
 ├── README.md
 └── LICENSE
 ```
 
----
+## Setup
 
-# 🚀 Local Setup
-
-## Backend
+### Backend
 
 ```
 cd trade-risk-backend
-
 python -m venv venv
 source venv/bin/activate
-
 pip install -r requirements.txt
+```
 
+Create `.env` file:
+
+```
+DATABASE_URL=sqlite:///./trade.db
+```
+
+Run backend:
+
+```
 uvicorn app.main:app --reload
 ```
 
-API
+API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-```
-http://127.0.0.1:8000
-```
-
-Docs
-
-```
-http://127.0.0.1:8000/docs
-```
-
----
-
-## Frontend
+### Frontend
 
 ```
 cd trade-risk-frontend
-
 npm install
 npm run dev
 ```
 
-Frontend
+Frontend: [http://localhost:5174](http://localhost:5174)
 
-```
-http://localhost:5174
-```
+## Strengths
 
----
-
-# 📈 Key Strengths
-
-* Hybrid AI + rule‑based anomaly detection
-* Context‑aware false positive reduction
-* Real‑time trade monitoring
+* Hybrid AI and rule-based detection
+* Context-aware false positive reduction
+* Real-time monitoring capability
 * Explainable investigation workflow
 * Persistent intelligence storage
-* Scalable architecture
+* Scalable modular architecture
 
 ---
 
-# 📜 License
+## License
 
 MIT License
 
 ---
 
-# 👨‍💻 Author
+## Author
 
-**Sai Shashank**
-
-Cybersecurity × Artificial Intelligence
-
-Building intelligent, adversarial‑resilient systems.
+Sai Shashank P |
+Cybersecurity Engineer

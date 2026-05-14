@@ -1,243 +1,132 @@
-# Trade Sentinel AI v2.5
+# 🌐 Trade Sentinel AI v2.5
 
-## Context-Aware Hybrid Trade Risk Intelligence Platform
-Trade Sentinel AI is a hybrid anomaly detection system designed to identify suspicious transaction behavior using techniques aligned with modern threat detection systems.
+[![Role](https://img.shields.io/badge/Role-SOC%20Analyst-blue.svg)]()
+[![Framework](https://img.shields.io/badge/Architecture-Hybrid%20AI%20%2B%20Rule%20Engine-purple.svg)]()
+[![Backend](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Scikit--Learn-green.svg)]()
+[![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue.svg)]()
 
-The platform applies principles used in cybersecurity detection engineering, including behavioral analysis, signal correlation, and risk scoring, to detect trade-based fraud scenarios.
+> **Context-Aware Hybrid Trade Risk Intelligence Platform**
+> Trade Sentinel AI is a hybrid anomaly detection system designed to identify suspicious transaction behavior using techniques aligned with modern threat detection systems. Legacy systems suffer from high false positives, static detection logic, and limited explainability. This project introduces a hybrid intelligence architecture that improves detection accuracy while maintaining operational efficiency.
 
-## Overview
+---
 
-Trade-based fraud such as over-invoicing, under-invoicing, abnormal routing, and suspicious counterparties is difficult to detect using traditional rule-based systems.
+## 🛡️ Cybersecurity & SOC Relevance
 
-Legacy systems typically suffer from high false positives, static detection logic, and limited explainability. This project introduces a hybrid intelligence architecture that improves detection accuracy while maintaining operational efficiency.
+This system applies core detection engineering principles directly mirrored from Security Operations Center (SOC) environments:
 
-## Cybersecurity Relevance
+* **Behavioral Anomaly Detection:** Functions similarly to UEBA (User and Entity Behavior Analytics) systems.
+* **Signal Correlation:** Fuses AI outputs with a strict rule engine, mimicking SIEM detection pipelines.
+* **Context-Aware Calibration:** Reduces false positives contextually, directly addressing alert fatigue challenges.
+* **Explainable Risk Scoring:** Provides transparent metric breakdowns to support rapid investigation workflows.
 
-This system applies core detection engineering principles used in SOC environments.
+---
 
-- Behavioral anomaly detection comparable to UEBA systems  
-- Signal correlation (AI + rule engine) similar to SIEM detection pipelines  
-- Context-aware false positive reduction aligned with real SOC challenges  
-- Explainable risk scoring to support investigation workflows  
+## 📈 Performance & Impact
 
-The architecture mirrors how modern security platforms detect and prioritize suspicious activity, making it directly relevant to threat detection and incident analysis.
+* **False Positive Reduction:** Reduced from **5,333 → 418 (~92% reduction)**.
+* **Recall Rate:** Maintained **~99% recall** for critical anomalies.
+* **Precision Improvement:** Increased from **~33% → 88%** after implementing context-aware calibration.
+* **Scale:** Validated on **100,000+** transactions.
 
+> **💡 Key Insight:** Initial hybrid modeling prioritized high recall, which caused precision to drop significantly (~33%). A context-aware calibration layer was engineered to reduce false positives without suppressing high-risk alerts, recovering precision while maintaining recall.
 
-## Key Features (v2.5)
+---
 
-### Live Trade Intelligence Monitor
+## ⚙️ Core Intelligence Pipeline
 
-* Manual trade transaction injection
-* Real-time hybrid risk evaluation
-* Immediate anomaly detection
-* Investigation workflow initiation
-
-### Risk Intelligence Dashboard
-
-* Transaction metrics and high-risk alerts
-* Risk distribution and concentration analysis
-* Global risk index and activity feed
-
-### Investigation Engine
-
-* Hybrid risk score (AI + rules + context)
-* Statistical anomaly signals
-* Model contribution breakdown
-* Rule trigger indicators
-* Explainable investigation summary
-
-### Persistent Storage
-
-* Historical transaction records
-* Stored anomaly analysis
-* Searchable intelligence database
-
-### Transaction Console
-
-* Transaction search and filtering
-* Risk classification inspection
-* Investigation launching interface
-
-## Performance Metrics
-
-* Reduced false positives from **5,333 → 418 (~92% reduction)**
-* Maintained **~99% recall**
-* Improved precision from **~33% → 88%** after context-aware calibration
-* Validated on **100,000+ transactions**
-
-## Key Insight
-
-Initial hybrid modeling prioritized high recall, which caused precision to drop significantly (~33%).
-
-A context-aware calibration layer was engineered to reduce false positives without suppressing high-risk alerts, recovering precision while maintaining recall.
-
-## Architecture
-
-```
-Trade Data
-     ↓
-Feature Engineering
-     ↓
-Isolation Forest (AI Score)
-     ↓
-Rule Engine (Compliance Signals)
-     ↓
-Hybrid Risk Model
-     ↓
-Context Calibration
-     ↓
-Final Risk Score
-     ↓
-Investigation Interface
-```
-
-## Core Components
-
-### Feature Engineering
-
+### 1. Feature Engineering
+Ensures context-aware and product-specific anomaly detection:
 * Price Z-score grouped by HS code
 * Volume Z-score grouped by HS code
-* Trade route frequency
-* Counterparty frequency
+* Trade route frequency & Counterparty frequency
 
-Ensures context-aware and product-specific anomaly detection.
+### 2. AI Model (Isolation Forest)
+* Unsupervised anomaly detection requiring no labeled dataset.
+* Highly efficient for parsing high-dimensional behavioral data.
 
-### AI Model (Isolation Forest)
+### 3. Rule Engine (Compliance Signals)
+Provides deterministic scoring based on hard thresholds. Score is capped at 100.
 
-* Unsupervised anomaly detection
-* No labeled dataset required
-* Efficient for high-dimensional data
+| Condition | Score Weight |
+| :--- | :--- |
+| **Price Z > 5** | +40 |
+| **Price Z > 3** | +30 |
+| **Volume Z > 5** | +30 |
+| **Volume Z > 3** | +20 |
+| **Rare Route** | +20 |
+| **Rare Exporter** | +10 |
 
-### Rule Engine
+### 4. Hybrid Risk Scoring
+Combines statistical deviations with deterministic rules:
+`raw_risk = 0.6 * ai_score + 0.4 * rule_score`
 
-| Condition     | Score |
-| ------------- | ----- |
-| Price Z > 5   | +40   |
-| Price Z > 3   | +30   |
-| Volume Z > 5  | +30   |
-| Volume Z > 3  | +20   |
-| Rare Route    | +20   |
-| Rare Exporter | +10   |
+| Risk Level | Threshold |
+| :--- | :--- |
+| 🔴 **High** | ≥ 75 |
+| 🟡 **Medium** | ≥ 50 |
+| 🟢 **Low** | < 50 |
 
-Score capped at 100.
+### 5. Context Calibration
+* High-risk alerts (≥ 75) are **never** suppressed.
+* Medium/Low risks are dynamically adjusted based on behavioral stability (e.g., stable routes, established exporters).
+* Maximum suppression is capped at 20% to prevent blind spots.
 
-### Hybrid Risk Model
+---
 
-```
-raw_risk = 0.6 * ai_score + 0.4 * rule_score
-```
+## 🖥️ Platform Interface & Features
 
-| Level  | Score |
-| ------ | ----- |
-| High   | ≥ 75  |
-| Medium | ≥ 50  |
-| Low    | < 50  |
+| Feature | Description | Screenshot Placeholder |
+| :--- | :--- | :--- |
+| **Risk Intelligence Dashboard** | Transaction metrics, risk distribution, and global risk index feeds. | ![Dashboard](assets/dashboard.png) |
+| **Live Trade Intelligence Monitor** | Manual transaction injection with real-time hybrid risk evaluation. | ![Live Monitor](assets/live-monitor.png) |
+| **Transaction Console** | Searchable intelligence database with risk classification filtering. | ![Transactions](assets/transactions.png) |
+| **Investigation Engine** | Explainable summaries showing AI contributions and rule triggers. | ![Investigation](assets/investigation.png) |
 
-### Context Calibration
+---
 
-* High-risk alerts are never suppressed
-* Medium/low risk adjusted based on behavioral stability
-* Suppression capped at 20%
+## 🛠️ Tech Stack
 
-```
-FinalRisk = RawRisk * ContextFactor
-ContextFactor ∈ [0.8, 1.0]
-```
+| Component | Technologies |
+| :--- | :--- |
+| **Backend API & ML** | `FastAPI`, `Python`, `Scikit-learn`, `Pandas`, `NumPy` |
+| **Database** | `SQLAlchemy`, `SQLite` / `PostgreSQL` |
+| **Frontend UI** | `React`, `Vite`, `Tailwind CSS`, `Recharts`, `Framer Motion` |
 
-## Interface
+---
 
-### Risk Intelligence Dashboard
+## 🚀 Setup & Installation
 
-![Dashboard](assets/dashboard.png)
-
-### Transaction Intelligence Console
-
-![Transactions](assets/transactions.png)
-
-### Investigation Detail View
-
-![Investigation](assets/investigation.png)
-
-### Live Trade Intelligence Monitor
-
-![Live Monitor](assets/live-monitor.png)
-
-## Tech Stack
-
-### Backend
-
-FastAPI, SQLAlchemy, Pandas, NumPy, Scikit-learn, SQLite/PostgreSQL
-
-### Frontend
-
-React, Vite, Tailwind CSS, Recharts, React Router
-
-## Project Structure
-
-```
-Trade-Sentinel-AI
-│
-├── trade-risk-backend
-├── trade-risk-frontend
-├── assets
-├── README.md
-└── LICENSE
-```
-
-## Setup
-
-### Backend
-
-```
+### Backend Setup
+```bash
 cd trade-risk-backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
-
-Create `.env` file:
-
-```
+Create a `.env` file in the backend directory:
+```env
 DATABASE_URL=sqlite:///./trade.db
 ```
-
-Run backend:
-
-```
+Start the API:
+```bash
 uvicorn app.main:app --reload
 ```
+*API running at [http://127.0.0.1:8000](http://127.0.0.1:8000) | Docs at `/docs`*
 
-API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-
-### Frontend
-
-```
+### Frontend Setup
+```bash
 cd trade-risk-frontend
 npm install
 npm run dev
 ```
-
-Frontend: [http://localhost:5174](http://localhost:5174)
-
-## Strengths
-
-* Hybrid AI and rule-based detection
-* Context-aware false positive reduction
-* Real-time monitoring capability
-* Explainable investigation workflow
-* Persistent intelligence storage
-* Scalable modular architecture
+*Frontend running at [http://localhost:5174](http://localhost:5174)*
 
 ---
 
-## License
+## 👤 Author
 
-MIT License
+**Sai Shashank P**
+*SOC Analyst*
 
 ---
-
-## Author
-
-Sai Shashank P |
-Cybersecurity Engineer
+*MIT License. Copyright (c) 2026 Sai Shashank.*

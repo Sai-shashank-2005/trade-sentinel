@@ -126,7 +126,7 @@ npm run dev
 ## 👤 Author
 
 **Sai Shashank P**
-*SOC Analyst*
+*SOC Analyst* | *System Engineer*
 
 ---
 *MIT License. Copyright (c) 2026 Sai Shashank.*

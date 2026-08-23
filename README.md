@@ -135,15 +135,37 @@ npm run dev
 ```
 *Frontend running at [http://localhost:5174](http://localhost:5174)*
 
-### Option B: Kubernetes Deployment (Production)
+### Option B: Kubernetes Deployment (Production / Enterprise)
 
-Start your cluster (e.g., Minikube) and apply the infrastructure manifests:
+This project uses an NGINX Ingress Controller to manage internal routing. You do not need to port-forward any pods.
+
+**1. Start the cluster and enable Ingress**
+```bash
+minikube start
+minikube addons enable ingress
+```
+
+**2. Deploy the Infrastructure**
 ```bash
 # 1. Deploy the Prometheus/Loki Observability Stack via Helm (Optional)
-# 2. Deploy the Trade Sentinel Application
+# 2. Deploy the Trade Sentinel Application (includes the Ingress resource)
 kubectl apply -f infrastructure/kubernetes/trade-sentinel/
 ```
-The FastAPI backend and React frontend will automatically load-balance across replicated pods and connect to a PostgreSQL StatefulSet.
+
+**3. Map the Local Domain**
+Because the Ingress controller routes traffic based on the hostname `trade-sentinel.local`, you must map this domain to your Minikube cluster IP. 
+
+Run this command to find your Minikube IP and append it to your hosts file:
+```bash
+echo "$(minikube ip) trade-sentinel.local" | sudo tee -a /etc/hosts
+```
+*Note: If you get a "DNS address could not be found" error in your browser, it means this step was skipped or your browser hasn't recognized the hosts file change yet.*
+
+**4. Access the Platform**
+Open your browser and navigate to:
+👉 **[http://trade-sentinel.local](http://trade-sentinel.local)**
+
+*(The Ingress Controller will automatically route `/` to the React frontend and `/api/*` to the FastAPI backend!)*
 
 ---
 

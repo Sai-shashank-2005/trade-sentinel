@@ -167,6 +167,13 @@ Open your browser and navigate to:
 
 *(The Ingress Controller will automatically route `/` to the React frontend and `/api/*` to the FastAPI backend!)*
 
+**5. Tear Down / Stop the Cluster**
+When you are finished testing, you can cleanly shut down the entire environment and free up your computer's CPU and RAM by stopping Minikube.
+```bash
+minikube stop
+```
+*(When you want to run it again, just run `minikube start` and everything will instantly resume exactly where you left off!)*
+
 ---
 
 ## 👤 Author

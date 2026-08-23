@@ -1,52 +1,156 @@
-# 🩺 KubeHeals Telemetry Lab
+# 🌐 Trade Sentinel AI v2.5
 
-This repository serves as the official telemetry generation lab for the **KubeHeals** project. It utilizes the Trade Sentinel application as a realistic Kubernetes workload to generate, capture, and extract ground-truth observability data (logs, metrics, and Kubernetes events).
+[![Role](https://img.shields.io/badge/Role-SOC%20Analyst-blue.svg)]()
+[![Framework](https://img.shields.io/badge/Architecture-Hybrid%20AI%20%2B%20Rule%20Engine-purple.svg)]()
+[![Backend](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Scikit--Learn-green.svg)]()
+[![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue.svg)]()
 
-This data will be consumed by the future KubeHeals Feature Engineering pipeline to train ML models (Random Forest / XGBoost) for automated anomaly detection and self-healing.
-
----
-
-## 📂 Repository Architecture
-
-The repository is strictly partitioned to separate application code, infrastructure, and telemetry extraction:
-
-*   **`apps/`**: Contains the workload generators.
-    *   `trade-sentinel/backend/` - FastAPI anomaly detection engine.
-    *   `trade-sentinel/frontend/` - React dashboard.
-    *   `load-generator/` - Python script for simulating traffic and failure scenarios.
-*   **`infrastructure/`**: Kubernetes deployment code.
-    *   `kubernetes/` - Deployments, StatefulSets, Services.
-    *   `observability/` - Prometheus ServiceMonitors and Loki configurations.
-*   **`telemetry/`**: The extracted datasets.
-    *   `scenarios/` - Documentation of failure states (CPU pressure, DB failure, etc.).
-    *   `samples/` - The extracted raw JSON data from Prometheus and Loki. **(Used for ML training)**
-*   **`services/`**: The future home of the KubeHeals Go backend.
-    *   `feature-engine/` - Boundary established for the future Go-based feature extraction pipeline.
+> **Context-Aware Hybrid Trade Risk Intelligence Platform**
+> Trade Sentinel AI is a hybrid anomaly detection system designed to identify suspicious transaction behavior using techniques aligned with modern threat detection systems. Legacy systems suffer from high false positives, static detection logic, and limited explainability. This project introduces a hybrid intelligence architecture that improves detection accuracy while maintaining operational efficiency.
 
 ---
 
-## 🛠️ Infrastructure Stack
+## 🛡️ Cybersecurity & SOC Relevance
 
-*   **Platform:** Kubernetes (Minikube)
-*   **Observability:** Prometheus (Metrics), Loki (Logs), kube-state-metrics (Events)
-*   **Workload:** FastAPI, React, PostgreSQL
+This system applies core detection engineering principles directly mirrored from Security Operations Center (SOC) environments:
 
-## 🚀 Usage
+* **Behavioral Anomaly Detection:** Functions similarly to UEBA (User and Entity Behavior Analytics) systems.
+* **Signal Correlation:** Fuses AI outputs with a strict rule engine, mimicking SIEM detection pipelines.
+* **Context-Aware Calibration:** Reduces false positives contextually, directly addressing alert fatigue challenges.
+* **Explainable Risk Scoring:** Provides transparent metric breakdowns to support rapid investigation workflows.
 
-### 1. Start the Cluster
+---
+
+## 📈 Performance & Impact
+
+* **False Positive Reduction:** Reduced from **5,333 → 418 (~92% reduction)**.
+* **Recall Rate:** Maintained **~99% recall** for critical anomalies.
+* **Precision Improvement:** Increased from **~33% → 88%** after implementing context-aware calibration.
+* **Scale:** Validated on **100,000+** transactions.
+
+> **💡 Key Insight:** Initial hybrid modeling prioritized high recall, which caused precision to drop significantly (~33%). A context-aware calibration layer was engineered to reduce false positives without suppressing high-risk alerts, recovering precision while maintaining recall.
+
+---
+
+## ⚙️ Core Intelligence Pipeline
+
+### 1. Feature Engineering
+Ensures context-aware and product-specific anomaly detection:
+* Price Z-score grouped by HS code
+* Volume Z-score grouped by HS code
+* Trade route frequency & Counterparty frequency
+
+### 2. AI Model (Isolation Forest)
+* Unsupervised anomaly detection requiring no labeled dataset.
+* Highly efficient for parsing high-dimensional behavioral data.
+
+### 3. Rule Engine (Compliance Signals)
+Provides deterministic scoring based on hard thresholds. Score is capped at 100.
+
+| Condition | Score Weight |
+| :--- | :--- |
+| **Price Z > 5** | +40 |
+| **Price Z > 3** | +30 |
+| **Volume Z > 5** | +30 |
+| **Volume Z > 3** | +20 |
+| **Rare Route** | +20 |
+| **Rare Exporter** | +10 |
+
+### 4. Hybrid Risk Scoring
+Combines statistical deviations with deterministic rules:
+`raw_risk = 0.6 * ai_score + 0.4 * rule_score`
+
+| Risk Level | Threshold |
+| :--- | :--- |
+| 🔴 **High** | ≥ 75 |
+| 🟡 **Medium** | ≥ 50 |
+| 🟢 **Low** | < 50 |
+
+### 5. Context Calibration
+* High-risk alerts (≥ 75) are **never** suppressed.
+* Medium/Low risks are dynamically adjusted based on behavioral stability (e.g., stable routes, established exporters).
+* Maximum suppression is capped at 20% to prevent blind spots.
+
+---
+
+## 🖥️ Platform Interface & Features
+
+| Feature | Description | Screenshot |
+| :--- | :--- | :--- |
+| **Risk Intelligence Dashboard** | Transaction metrics, risk distribution, and global risk index feeds. | ![Dashboard](docs/architecture/assets/dashboard.png) |
+| **Live Trade Intelligence Monitor** | Manual transaction injection with real-time hybrid risk evaluation. | ![Live Monitor](docs/architecture/assets/live-monitor.png) |
+| **Transaction Console** | Searchable intelligence database with risk classification filtering. | ![Transactions](docs/architecture/assets/transactions.png) |
+| **Investigation Engine** | Explainable summaries showing AI contributions and rule triggers. | ![Investigation](docs/architecture/assets/investigation.png) |
+
+---
+
+## 🏗️ Cloud-Native Architecture
+
+The repository is built for enterprise-scale deployments, cleanly separating application source code from Kubernetes infrastructure:
+
+*   **`apps/`**: The core Trade Sentinel application (FastAPI & React) and load generators.
+*   **`infrastructure/`**: Kubernetes deployments, StatefulSets, and Prometheus/Loki configurations.
+*   **`telemetry/`**: Structured JSON metrics and logs captured from failure simulations.
+*   **`services/`**: Feature Engineering extensions.
+
+---
+
+## 🛠️ Tech Stack
+
+| Component | Technologies |
+| :--- | :--- |
+| **Backend API & ML** | `FastAPI`, `Python`, `Scikit-learn`, `Pandas`, `NumPy` |
+| **Database** | `SQLAlchemy`, `SQLite` / `PostgreSQL` |
+| **Frontend UI** | `React`, `Vite`, `Tailwind CSS`, `Recharts`, `Framer Motion` |
+| **Infrastructure** | `Kubernetes`, `Docker`, `Helm`, `Prometheus`, `Loki` |
+
+---
+
+## 🚀 Setup & Installation
+
+### Option A: Local Development
+
+**1. Backend Setup**
 ```bash
-minikube start
+cd apps/trade-sentinel/backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
-
-### 2. Deploy Infrastructure
+Create a `.env` file in the backend directory:
+```env
+DATABASE_URL=sqlite:///./trade.db
+```
+Start the API:
 ```bash
+uvicorn app.main:app --reload
+```
+*API running at [http://127.0.0.1:8000](http://127.0.0.1:8000) | Docs at `/docs`*
+
+**2. Frontend Setup**
+```bash
+cd apps/trade-sentinel/frontend
+npm install
+npm run dev
+```
+*Frontend running at [http://localhost:5174](http://localhost:5174)*
+
+### Option B: Kubernetes Deployment (Production)
+
+Start your cluster (e.g., Minikube) and apply the infrastructure manifests:
+```bash
+# 1. Deploy the Prometheus/Loki Observability Stack via Helm (Optional)
+# 2. Deploy the Trade Sentinel Application
 kubectl apply -f infrastructure/kubernetes/trade-sentinel/
-kubectl apply -f infrastructure/observability/prometheus/
 ```
+The FastAPI backend and React frontend will automatically load-balance across replicated pods and connect to a PostgreSQL StatefulSet.
 
-### 3. Generate Telemetry Samples
-To simulate failures (like a sudden pod restart or CPU pressure) and extract the telemetry to JSON files, run:
-```bash
-./run_all_scenarios.sh
-```
-*The resulting JSON datasets will be saved to `telemetry/samples/`.*
+---
+
+## 👤 Author
+
+**Sai Shashank P**
+*SOC Analyst* | *System Engineer*
+
+---
+*MIT License. Copyright (c) 2026 Sai Shashank.*

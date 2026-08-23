@@ -1,0 +1,23 @@
+{
+  "http_requests_total{app=\"backend\"}": {
+    "status": "success",
+    "data": {
+      "resultType": "matrix",
+      "result": []
+    }
+  },
+  "http_request_duration_seconds_sum{app=\"backend\"}": {
+    "status": "success",
+    "data": {
+      "resultType": "matrix",
+      "result": []
+    }
+  },
+  "http_request_duration_seconds_count{app=\"backend\"}": {
+    "status": "success",
+    "data": {
+      "resultType": "matrix",
+      "result": []
+    }
+  }
+}

@@ -103,45 +103,34 @@ def live_trade(trade: dict, db: Session = Depends(get_db)):
     # ----------------------------------
 
     transaction = Transaction(
-
-        transaction_id=row["transaction_id"],
-
-        date=row["date"],
-        importer=row["importer"],
-        exporter=row["exporter"],
-        hs_code=row["hs_code"],
-
-        quantity=row["quantity"],
-        unit_price=row["unit_price"],
-        total_value=row["total_value"],
-
-        origin_country=row["origin_country"],
-        destination_country=row["destination_country"],
-        route=row["route"],
-
+        transaction_id=int(row["transaction_id"]),
+        date=str(row["date"]),
+        importer=str(row["importer"]),
+        exporter=str(row["exporter"]),
+        hs_code=str(row["hs_code"]),
+        quantity=float(row["quantity"]),
+        unit_price=float(row["unit_price"]),
+        total_value=float(row["total_value"]),
+        origin_country=str(row["origin_country"]),
+        destination_country=str(row["destination_country"]),
+        route=str(row["route"]),
         dataset_name="live_trade",
         source="live",
-
-        raw_risk=row["raw_risk"],
-        final_risk=row["final_risk"],
-        ai_score=row["ai_score"],
-        rule_score=row["rule_score"],
-
-        risk_level=row["final_risk_level"],
-
-        context_adjustment=row["context_adjustment"],
-
-        price_zscore=row["price_zscore"],
-        volume_zscore=row["volume_zscore"],
-        route_frequency=row["route_frequency"],
-        counterparty_frequency=row["counterparty_frequency"],
-
-        price_rule_triggered=row["price_rule_triggered"],
-        volume_rule_triggered=row["volume_rule_triggered"],
-        route_rule_triggered=row["route_rule_triggered"],
-        exporter_rule_triggered=row["exporter_rule_triggered"],
-
-        explanation_text=row["explanation_text"]
+        raw_risk=float(row["raw_risk"]),
+        final_risk=float(row["final_risk"]),
+        ai_score=float(row["ai_score"]),
+        rule_score=float(row["rule_score"]),
+        risk_level=str(row["final_risk_level"]),
+        context_adjustment=float(row["context_adjustment"]),
+        price_zscore=float(row["price_zscore"]),
+        volume_zscore=float(row["volume_zscore"]),
+        route_frequency=float(row["route_frequency"]),
+        counterparty_frequency=float(row["counterparty_frequency"]),
+        price_rule_triggered=bool(row["price_rule_triggered"]),
+        volume_rule_triggered=bool(row["volume_rule_triggered"]),
+        route_rule_triggered=bool(row["route_rule_triggered"]),
+        exporter_rule_triggered=bool(row["exporter_rule_triggered"]),
+        explanation_text=str(row["explanation_text"])
     )
 
     db.add(transaction)

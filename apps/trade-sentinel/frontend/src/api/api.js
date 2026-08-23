@@ -23,3 +23,7 @@ export const uploadCSV = async (formData) => {
   });
   return res.data;
 };
+export const clearTransactions = async () => {
+  const res = await axios.delete(`${API_BASE}/transactions`);
+  return res.data;
+};

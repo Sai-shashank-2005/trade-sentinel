@@ -64,3 +64,16 @@ def get_transaction_detail(
     ).first()
 
     return transaction
+# -------------------------------
+# DELETE ALL TRANSACTIONS
+# -------------------------------
+
+@router.delete("/transactions")
+def delete_all_transactions(db: Session = Depends(get_db)):
+    try:
+        num_deleted = db.query(Transaction).delete()
+        db.commit()
+        return {"message": f"Deleted {num_deleted} transactions."}
+    except Exception as e:
+        db.rollback()
+        return {"error": str(e)}

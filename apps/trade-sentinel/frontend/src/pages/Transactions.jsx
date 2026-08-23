@@ -49,6 +49,19 @@ export default function Transactions() {
     loadTransactions();
   }
 
+  async function handleClearHistory() {
+    if (window.confirm("Are you sure you want to delete ALL transaction history? This cannot be undone.")) {
+      try {
+        await axios.delete(`${API}/transactions`);
+        setPage(1);
+        loadTransactions();
+      } catch (err) {
+        console.error("Failed to clear history", err);
+        alert("Failed to clear history");
+      }
+    }
+  }
+
   function riskBadge(level) {
 
     if (level === "High")
@@ -116,6 +129,13 @@ export default function Transactions() {
           className="bg-blue-500 hover:bg-blue-600 transition px-4 py-2 rounded-lg"
         >
           Search
+        </button>
+
+        <button
+          onClick={handleClearHistory}
+          className="bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/50 transition px-4 py-2 rounded-lg ml-auto"
+        >
+          Clear History
         </button>
 
 

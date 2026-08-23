@@ -1,0 +1,990 @@
+Yes. Since you want to **use the existing Trade Sentinel project as the starting point**, the instruction to AGY should be about **transforming its current application into a Kubernetes telemetry-generation environment**, not rebuilding KubeHeals feature engineering yet.
+
+The current project is a FastAPI + scikit-learn backend with React/Vite frontend, and its existing pipeline is centered around transaction CSV/live-trade data.  Its current feature engineering is specifically based on trade fields such as HS code, price, quantity, route, and exporter frequency.
+
+So give AGY **this exact instruction**:
+
+---
+
+# AGY IMPLEMENTATION INSTRUCTION
+
+## Transform Trade Sentinel into KubeHeals Kubernetes Telemetry Lab
+
+### Objective
+
+Use the **existing Trade Sentinel AI v2.5 project as the starting codebase**.
+
+Do NOT delete the project and rebuild it from scratch.
+
+Do NOT implement KubeHeals feature engineering yet.
+
+The immediate goal is to transform the existing application into a **Kubernetes-native telemetry generation environment** that can run inside a Kubernetes cluster and produce realistic:
+
+* application logs
+* Prometheus metrics
+* Kubernetes workload state
+* Kubernetes events
+* dependency failures
+* controlled failure scenarios
+
+These real telemetry outputs will later become the input to the KubeHeals feature-engineering pipeline.
+
+The existing Trade Sentinel application currently consists of:
+
+```text
+React + Vite frontend
+        ↓
+FastAPI backend
+        ↓
+SQLAlchemy database
+        ↓
+Feature Engineering
+        ↓
+Isolation Forest
+        ↓
+Rule Engine
+        ↓
+Risk Scoring
+        ↓
+Context Layer
+        ↓
+Explanation Engine
+```
+
+The current application uses trade transactions as its input and has CSV upload and live-trade functionality.
+
+We are now repurposing the application **as a Kubernetes workload generator / telemetry laboratory**, not as the final KubeHeals ML system.
+
+---
+
+# 1. CRITICAL SCOPE
+
+For this phase, focus ONLY on:
+
+```text
+Trade Sentinel
+      ↓
+Containerize
+      ↓
+Deploy to Kubernetes
+      ↓
+Generate realistic workload
+      ↓
+Expose metrics
+      ↓
+Generate structured logs
+      ↓
+Generate Kubernetes-observable failures
+      ↓
+Collect telemetry using:
+    Prometheus
+    Loki
+    Kubernetes API
+```
+
+Do NOT implement:
+
+```text
+❌ KubeHeals feature engineering
+❌ Random Forest
+❌ XGBoost
+❌ failure prediction
+❌ remediation
+❌ self-healing
+❌ AQX
+❌ report generation
+❌ autonomous Kubernetes actions
+```
+
+Those belong to the next phase.
+
+---
+
+# 2. Preserve Existing Trade Sentinel
+
+Do not unnecessarily destroy the existing functionality.
+
+The current backend contains:
+
+```text
+app/
+├── main.py
+├── database.py
+├── models.py
+├── routes/
+└── services/
+```
+
+and the frontend contains:
+
+```text
+src/
+├── App.jsx
+├── pages/
+├── components/
+└── api/
+```
+
+Preserve this structure wherever practical.
+
+The existing Trade Sentinel application should continue to function normally after containerization.
+
+---
+
+# 3. Target Kubernetes Architecture
+
+Build this environment:
+
+```text
+                    Kubernetes Cluster
+                           │
+             ┌─────────────┴─────────────┐
+             │                           │
+             ▼                           ▼
+      Trade Sentinel                Telemetry
+        Workloads                  Infrastructure
+             │                           │
+     ┌───────┼────────┐          ┌───────┼────────┐
+     │       │        │          │       │        │
+     ▼       ▼        ▼          ▼       ▼        ▼
+ Backend  Frontend  DB       Prometheus Loki   K8s API
+     │       │        │
+     └───────┴────────┘
+             │
+             ▼
+       Real telemetry
+```
+
+The application should be deployed as multiple Kubernetes workloads rather than one giant container.
+
+---
+
+# 4. Workloads
+
+Create the following logical components.
+
+## 4.1 Trade Sentinel Backend
+
+Containerize the existing FastAPI backend.
+
+Current startup:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+This is already defined in the project's Procfile.
+
+Expose it internally through Kubernetes.
+
+Example:
+
+```text
+trade-sentinel-backend
+```
+
+---
+
+# 5. Frontend
+
+Containerize the existing React/Vite frontend.
+
+Build:
+
+```bash
+npm run build
+```
+
+Serve the production build through an appropriate lightweight web server.
+
+Example architecture:
+
+```text
+Internet / Ingress
+        ↓
+Frontend
+        ↓
+Backend Service
+```
+
+Do not over-engineer the frontend.
+
+The frontend exists primarily to create realistic application traffic.
+
+---
+
+# 6. Database
+
+The current application supports SQLite/PostgreSQL through SQLAlchemy.
+
+For the Kubernetes telemetry environment:
+
+**Use PostgreSQL.**
+
+Do not use SQLite as the primary Kubernetes deployment database.
+
+Architecture:
+
+```text
+Trade Sentinel Backend
+        │
+        ▼
+PostgreSQL
+```
+
+Use Kubernetes configuration/secrets for:
+
+```text
+DATABASE_HOST
+DATABASE_PORT
+DATABASE_NAME
+DATABASE_USER
+DATABASE_PASSWORD
+```
+
+Do not hardcode credentials.
+
+---
+
+# 7. Application Logging
+
+This is one of the most important requirements.
+
+The backend must produce **structured JSON logs to stdout**.
+
+Do not write logs primarily to files.
+
+Kubernetes/container runtime should capture stdout/stderr.
+
+Example:
+
+```json
+{
+  "timestamp": "2026-08-22T10:30:21.421Z",
+  "level": "INFO",
+  "service": "trade-sentinel-backend",
+  "event": "request_completed",
+  "method": "POST",
+  "path": "/live-trade",
+  "status_code": 200,
+  "latency_ms": 42,
+  "request_id": "..."
+}
+```
+
+Error example:
+
+```json
+{
+  "timestamp": "2026-08-22T10:30:23.421Z",
+  "level": "ERROR",
+  "service": "trade-sentinel-backend",
+  "event": "database_error",
+  "error_type": "connection_timeout",
+  "message": "database request timed out"
+}
+```
+
+Generate logs for:
+
+```text
+request received
+request completed
+request failed
+database query
+database error
+CSV processing
+feature processing
+model processing
+validation failure
+dependency failure
+startup
+shutdown
+health check
+```
+
+---
+
+# 8. Request Correlation
+
+Add a request ID middleware.
+
+Every request should have:
+
+```text
+request_id
+```
+
+The request ID must appear in every log generated during that request.
+
+Example:
+
+```text
+request received
+      ↓
+database query
+      ↓
+feature processing
+      ↓
+response
+```
+
+All logs:
+
+```text
+request_id = abc123
+```
+
+This will later allow KubeHeals to correlate logs with metrics and incidents.
+
+---
+
+# 9. Prometheus Metrics
+
+Add a Prometheus `/metrics` endpoint to the backend.
+
+Expose application-level metrics.
+
+At minimum:
+
+### HTTP
+
+```text
+http_requests_total
+http_request_duration_seconds
+http_requests_in_flight
+http_errors_total
+```
+
+### Application
+
+```text
+trade_analysis_total
+trade_analysis_errors_total
+trade_analysis_duration_seconds
+
+csv_upload_total
+csv_processing_errors_total
+
+live_trade_total
+live_trade_errors_total
+```
+
+### Database
+
+```text
+database_queries_total
+database_errors_total
+database_query_duration_seconds
+database_connections
+```
+
+### Model
+
+```text
+model_predictions_total
+model_prediction_errors_total
+model_prediction_duration_seconds
+```
+
+Do not expose unbounded labels.
+
+Avoid labels such as:
+
+```text
+transaction_id
+request_id
+user_id
+```
+
+because they can create enormous Prometheus cardinality.
+
+Use bounded labels such as:
+
+```text
+method
+route
+status
+operation
+```
+
+---
+
+# 10. Health Endpoints
+
+Add:
+
+```text
+/health
+/ready
+```
+
+### `/health`
+
+Only determines whether the process is alive.
+
+### `/ready`
+
+Checks whether required dependencies are available.
+
+For example:
+
+```text
+PostgreSQL reachable
+application initialized
+```
+
+Do not make `/health` depend on PostgreSQL.
+
+---
+
+# 11. Kubernetes Deployment
+
+Create:
+
+```text
+deploy/
+└── kubernetes/
+    ├── namespace.yaml
+    ├── backend-deployment.yaml
+    ├── backend-service.yaml
+    ├── frontend-deployment.yaml
+    ├── frontend-service.yaml
+    ├── postgres-statefulset.yaml
+    ├── postgres-service.yaml
+    ├── configmap.yaml
+    └── secret.yaml
+```
+
+Do not use:
+
+```text
+hostNetwork: true
+privileged: true
+```
+
+unless there is a demonstrated requirement.
+
+---
+
+# 12. Resource Requests and Limits
+
+Every workload must have explicit resource requests and limits.
+
+Example:
+
+```yaml
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+```
+
+Tune these after observing real usage.
+
+Do not blindly choose large limits.
+
+---
+
+# 13. Replicas
+
+The backend should support:
+
+```text
+replicas: 2
+```
+
+initially.
+
+The application must remain stateless at the process level.
+
+Persistent state belongs in PostgreSQL.
+
+This allows us to later test:
+
+```text
+pod failure
+pod replacement
+load distribution
+rolling deployment
+```
+
+---
+
+# 14. Kubernetes Observability
+
+Install/configure:
+
+```text
+Prometheus
+Loki
+kube-state-metrics
+```
+
+The objective is to make the following observable.
+
+### Application
+
+```text
+request rate
+latency
+errors
+database errors
+model processing
+```
+
+### Container
+
+```text
+CPU
+memory
+network
+restarts
+container state
+```
+
+### Kubernetes
+
+```text
+pod phase
+readiness
+liveness
+replicas
+deployment state
+restart count
+OOMKilled
+scheduling events
+image pull errors
+```
+
+---
+
+# 15. Controlled Failure Generator
+
+Create a separate component:
+
+```text
+load-generator
+```
+
+Its purpose is to generate controlled application traffic and failure conditions.
+
+It must NOT perform destructive actions against the cluster.
+
+It can call application endpoints to generate:
+
+```text
+normal traffic
+high request rate
+HTTP 500
+slow requests
+database errors
+database latency
+```
+
+Example modes:
+
+```text
+normal
+load
+error
+latency
+dependency-failure
+burst
+```
+
+---
+
+# 16. Failure Scenarios
+
+The environment must allow us to reproduce:
+
+### Scenario 1 — Normal
+
+```text
+normal traffic
+normal CPU
+normal memory
+low error rate
+```
+
+### Scenario 2 — HTTP Error Spike
+
+```text
+request rate ↑
+HTTP 5xx ↑
+error logs ↑
+```
+
+### Scenario 3 — Database Failure
+
+```text
+database unavailable
+        ↓
+API errors ↑
+latency ↑
+ERROR logs ↑
+```
+
+### Scenario 4 — Database Latency
+
+```text
+DB latency ↑
+        ↓
+API latency ↑
+        ↓
+timeouts ↑
+```
+
+### Scenario 5 — CPU Pressure
+
+Generate controlled CPU load in the backend.
+
+Expected telemetry:
+
+```text
+CPU ↑
+latency ↑
+possibly errors ↑
+```
+
+### Scenario 6 — Memory Pressure
+
+Generate controlled memory allocation.
+
+Expected:
+
+```text
+memory ↑
+container pressure
+possibly OOMKilled
+pod restart
+```
+
+This scenario must be carefully bounded so it does not destabilize the entire cluster.
+
+### Scenario 7 — Pod Restart
+
+Allow controlled restart behavior.
+
+We need telemetry showing:
+
+```text
+restart_count ↑
+pod state changes
+Kubernetes events
+```
+
+### Scenario 8 — Deployment Change
+
+Perform a controlled deployment update.
+
+We want:
+
+```text
+deployment change
+pod replacement
+replica transitions
+```
+
+---
+
+# 17. Do NOT Fake Telemetry
+
+This is critical.
+
+Do NOT create files such as:
+
+```text
+fake_prometheus.json
+fake_loki.json
+fake_kubernetes_events.json
+```
+
+as the primary telemetry source.
+
+We need:
+
+```text
+REAL APPLICATION
+      ↓
+REAL CONTAINER
+      ↓
+REAL KUBERNETES
+      ↓
+REAL PROMETHEUS
+      ↓
+REAL LOKI
+      ↓
+REAL KUBERNETES API
+```
+
+Synthetic data may later be used for testing, but first establish real telemetry.
+
+---
+
+# 18. Telemetry Capture
+
+Create a directory:
+
+```text
+telemetry-samples/
+```
+
+After deployment, capture representative real responses:
+
+```text
+telemetry-samples/
+├── prometheus/
+├── loki/
+└── kubernetes/
+```
+
+Examples:
+
+```text
+prometheus/
+    cpu.json
+    memory.json
+    http.json
+    database.json
+
+loki/
+    normal.json
+    errors.json
+    database-errors.json
+
+kubernetes/
+    pods.json
+    events.json
+    deployments.json
+```
+
+These samples will later be used to build the KubeHeals telemetry adapters.
+
+---
+
+# 19. Preserve Ground Truth
+
+Every failure experiment must record:
+
+```text
+scenario_id
+start_time
+end_time
+expected_failure
+affected_workload
+```
+
+Example:
+
+```json
+{
+  "scenario_id": "db-timeout-001",
+  "start_time": "...",
+  "end_time": "...",
+  "affected_workload": "trade-sentinel-backend",
+  "expected_failure": "database_timeout"
+}
+```
+
+This is extremely important.
+
+Later we can correlate:
+
+```text
+GROUND TRUTH
+      +
+Loki
+      +
+Prometheus
+      +
+Kubernetes
+      ↓
+Feature engineering
+      ↓
+Training dataset
+```
+
+---
+
+# 20. Keep Trade Sentinel ML Separate
+
+Do not attempt to convert the current Isolation Forest directly into the KubeHeals model.
+
+The current Trade Sentinel model uses:
+
+```text
+price_zscore
+volume_zscore
+route_frequency
+counterparty_frequency
+```
+
+and feeds them into Isolation Forest.
+
+Those features are irrelevant to Kubernetes.
+
+For this phase:
+
+```text
+Trade Sentinel model
+        ↓
+can remain untouched
+```
+
+The application is being used primarily as the **real Kubernetes workload and telemetry generator**.
+
+---
+
+# 21. Target End State
+
+The finished environment should look like:
+
+```text
+                         KUBERNETES
+┌───────────────────────────────────────────────────────────────┐
+│                                                               │
+│   ┌─────────────────┐       ┌─────────────────┐              │
+│   │    Frontend     │       │    Backend      │              │
+│   │                 │──────▶│   FastAPI       │              │
+│   └─────────────────┘       └────────┬────────┘              │
+│                                      │                        │
+│                                      ▼                        │
+│                              ┌──────────────┐                 │
+│                              │  PostgreSQL  │                 │
+│                              └──────────────┘                 │
+│                                                               │
+│   ┌─────────────────┐                                         │
+│   │ Load Generator  │───────────────┐                         │
+│   └─────────────────┘               │                         │
+│                                     ▼                         │
+│                            Application Traffic                │
+│                                                               │
+│   ───────────────── OBSERVABILITY ─────────────────────────  │
+│                                                               │
+│        ┌──────────────┐       ┌──────────────┐               │
+│        │ Prometheus   │       │     Loki     │               │
+│        │              │       │              │               │
+│        │ Metrics      │       │ Logs         │               │
+│        └──────┬───────┘       └──────┬───────┘               │
+│               │                      │                        │
+│               └──────────┬───────────┘                        │
+│                          │                                    │
+│                          ▼                                    │
+│                  REAL TELEMETRY                              │
+│                                                               │
+│              Kubernetes API / kube-state-metrics              │
+│                          │                                    │
+│                          ▼                                    │
+│                   Cluster State                              │
+│                                                               │
+└───────────────────────────────────────────────────────────────┘
+```
+
+---
+
+# 22. Acceptance Criteria
+
+Do not consider this phase complete until all of these work.
+
+### Application
+
+```text
+[ ] Backend runs in Kubernetes
+[ ] Frontend runs in Kubernetes
+[ ] PostgreSQL runs in Kubernetes
+[ ] Backend connects to PostgreSQL
+[ ] Health endpoint works
+[ ] Readiness endpoint works
+```
+
+### Logs
+
+```text
+[ ] Structured JSON logs
+[ ] Logs written to stdout
+[ ] Request IDs
+[ ] Error logs
+[ ] Database logs
+[ ] Application lifecycle logs
+```
+
+### Metrics
+
+```text
+[ ] /metrics endpoint
+[ ] HTTP metrics
+[ ] latency metrics
+[ ] error metrics
+[ ] database metrics
+[ ] model metrics
+```
+
+### Observability
+
+```text
+[ ] Prometheus scraping works
+[ ] Loki receives logs
+[ ] Kubernetes state is observable
+[ ] Kubernetes events are observable
+```
+
+### Failure experiments
+
+```text
+[ ] HTTP error spike
+[ ] database failure
+[ ] database latency
+[ ] CPU pressure
+[ ] memory pressure
+[ ] pod restart
+[ ] deployment change
+```
+
+### Evidence
+
+```text
+[ ] Real Prometheus responses captured
+[ ] Real Loki responses captured
+[ ] Real Kubernetes responses captured
+[ ] Failure scenarios timestamped
+[ ] Ground truth recorded
+```
+
+---
+
+# 23. Final Instruction to AGY
+
+**Do not start by rewriting the application.**
+
+First:
+
+```text
+1. Inspect the existing Trade Sentinel repository.
+2. Identify its current backend/frontend/database architecture.
+3. Identify the minimum modifications required.
+4. Containerize the existing application.
+5. Deploy it locally to a Kubernetes cluster.
+6. Add structured stdout logging.
+7. Add Prometheus instrumentation.
+8. Add health/readiness endpoints.
+9. Deploy PostgreSQL.
+10. Add controlled load/failure generation.
+11. Install/configure Prometheus + Loki + kube-state-metrics.
+12. Verify real telemetry is being produced.
+13. Capture representative telemetry samples.
+14. Document the actual telemetry formats.
+15. STOP.
+```
+
+**Do not implement the KubeHeals feature-engineering pipeline until these real telemetry samples have been captured and reviewed.**
+
+The output of this phase should be a **working Kubernetes telemetry laboratory built from the existing Trade Sentinel project**, ready to become the real data source for the KubeHeals feature-engineering pipeline.
+
+---
+
+This is the approach I'd use because the existing Trade Sentinel already has a working application and API pipeline, rather than wasting time rebuilding a dummy Kubernetes app. Its backend also already has persistent PostgreSQL support available alongside SQLite fallback, which makes the migration straightforward.

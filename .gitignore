@@ -24,3 +24,11 @@ Thumbs.db
 
 # Logs
 *.log
+# IDEs
+.idea/
+.vscode/
+*.swp
+
+# Kubernetes / Minikube local state
+.minikube/
+kubeconfig

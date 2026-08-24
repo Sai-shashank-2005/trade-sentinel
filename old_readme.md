@@ -75,23 +75,12 @@ Combines statistical deviations with deterministic rules:
 
 ## 🖥️ Platform Interface & Features
 
-| Feature | Description | Screenshot |
+| Feature | Description | Screenshot Placeholder |
 | :--- | :--- | :--- |
-| **Risk Intelligence Dashboard** | Transaction metrics, risk distribution, and global risk index feeds. | ![Dashboard](docs/architecture/assets/dashboard.png) |
-| **Live Trade Intelligence Monitor** | Manual transaction injection with real-time hybrid risk evaluation. | ![Live Monitor](docs/architecture/assets/live-monitor.png) |
-| **Transaction Console** | Searchable intelligence database with risk classification filtering. | ![Transactions](docs/architecture/assets/transactions.png) |
-| **Investigation Engine** | Explainable summaries showing AI contributions and rule triggers. | ![Investigation](docs/architecture/assets/investigation.png) |
-
----
-
-## 🏗️ Cloud-Native Architecture
-
-The repository is built for enterprise-scale deployments, cleanly separating application source code from Kubernetes infrastructure:
-
-*   **`apps/`**: The core Trade Sentinel application (FastAPI & React) and load generators.
-*   **`infrastructure/`**: Kubernetes deployments, StatefulSets, and Prometheus/Loki configurations.
-*   **`telemetry/`**: Structured JSON metrics and logs captured from failure simulations.
-*   **`services/`**: Feature Engineering extensions.
+| **Risk Intelligence Dashboard** | Transaction metrics, risk distribution, and global risk index feeds. | ![Dashboard](assets/dashboard.png) |
+| **Live Trade Intelligence Monitor** | Manual transaction injection with real-time hybrid risk evaluation. | ![Live Monitor](assets/live-monitor.png) |
+| **Transaction Console** | Searchable intelligence database with risk classification filtering. | ![Transactions](assets/transactions.png) |
+| **Investigation Engine** | Explainable summaries showing AI contributions and rule triggers. | ![Investigation](assets/investigation.png) |
 
 ---
 
@@ -102,17 +91,14 @@ The repository is built for enterprise-scale deployments, cleanly separating app
 | **Backend API & ML** | `FastAPI`, `Python`, `Scikit-learn`, `Pandas`, `NumPy` |
 | **Database** | `SQLAlchemy`, `SQLite` / `PostgreSQL` |
 | **Frontend UI** | `React`, `Vite`, `Tailwind CSS`, `Recharts`, `Framer Motion` |
-| **Infrastructure** | `Kubernetes`, `Docker`, `Helm`, `Prometheus`, `Loki` |
 
 ---
 
 ## 🚀 Setup & Installation
 
-### Option A: Local Development
-
-**1. Backend Setup**
+### Backend Setup
 ```bash
-cd apps/trade-sentinel/backend
+cd trade-risk-backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -127,37 +113,13 @@ uvicorn app.main:app --reload
 ```
 *API running at [http://127.0.0.1:8000](http://127.0.0.1:8000) | Docs at `/docs`*
 
-**2. Frontend Setup**
+### Frontend Setup
 ```bash
-cd apps/trade-sentinel/frontend
+cd trade-risk-frontend
 npm install
 npm run dev
 ```
 *Frontend running at [http://localhost:5174](http://localhost:5174)*
-
-### Option B: Kubernetes Deployment (Production / Enterprise)
-
-This project is orchestrated using a unified `Makefile` for one-click environment bootstrapping.
-
-**1. One-Click Bootstrap**
-Automates tool validation, Go module downloads, and Python AI environment setup:
-```bash
-make setup
-```
-
-**2. Smart Instant-Up (Deploy Cluster & Intelligence Layer)**
-Automatically boots the Minikube cluster, enables NGINX Ingress, deploys Trade Sentinel AI, and waits for 100% microservice readiness.
-```bash
-make up
-```
-*The command will output the direct IP address where Trade Sentinel AI is running. Click the link to access the platform!*
-
-**3. Tear Down / Stop the Cluster**
-When you are finished testing, cleanly shut down the entire environment:
-```bash
-make down
-```
-*(When you want to run it again, just run `make up` and it will instantly resume!)*
 
 ---
 

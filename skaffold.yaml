@@ -1,0 +1,13 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: kubeheals
+build:
+  artifacts:
+  - image: kubeheals-feature-engine
+    context: services/feature-engine
+    docker:
+      dockerfile: Dockerfile
+manifests:
+  rawYaml:
+  - infrastructure/kubernetes/feature-engine/job.yaml

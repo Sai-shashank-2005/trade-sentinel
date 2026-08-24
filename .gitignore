@@ -24,6 +24,7 @@ Thumbs.db
 
 # Logs
 *.log
+
 # IDEs
 .idea/
 .vscode/
@@ -32,3 +33,20 @@ Thumbs.db
 # Kubernetes / Minikube local state
 .minikube/
 kubeconfig
+
+# KubeHeals Telemetry Datasets (Do not track massive datasets)
+telemetry/dataset/*.csv
+telemetry/canonical/*.jsonl
+
+# KubeHeals AI Models (Do not track massive model weights)
+services/ai-engine/models/*.json
+services/ai-engine/models/*.joblib
+services/ai-engine/models/*.pkl
+
+# Go Compiled Binaries
+services/aqx-normalizer/aqx_normalizer
+services/feature-engine/build_features
+bin/
+*.exe
+*.test
+*.out

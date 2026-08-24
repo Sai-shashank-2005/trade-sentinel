@@ -3,21 +3,17 @@
     "status": "success",
     "data": {
       "resultType": "matrix",
-      "result": []
-    }
-  },
-  "http_request_duration_seconds_sum{app=\"backend\"}": {
-    "status": "success",
-    "data": {
-      "resultType": "matrix",
-      "result": []
-    }
-  },
-  "http_request_duration_seconds_count{app=\"backend\"}": {
-    "status": "success",
-    "data": {
-      "resultType": "matrix",
-      "result": []
+      "result": [
+        {
+          "metric": {"app": "backend"},
+          "values": [
+            [1700000000, "100"],
+            [1700000005, "110"],
+            [1700000010, "120"],
+            [1700000015, "130"]
+          ]
+        }
+      ]
     }
   }
 }

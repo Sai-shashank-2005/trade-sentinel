@@ -1,0 +1,46 @@
+# KubeHeals AI Engine Configuration
+
+version: "1.0"
+
+dataset:
+  path: "../../telemetry/dataset/kubeheals_training_data.csv"
+  features:
+    - ReqRate
+    - LogVolume
+    - ErrorCount
+  target: Label
+  test_size: 0.2
+  random_state: 42
+
+models:
+  isolation_forest:
+    contamination: 0.15
+    n_estimators: 100
+    random_state: 42
+    export_path: "models/isolation_forest.json"
+
+  random_forest:
+    n_estimators: 150
+    max_depth: 10
+    min_samples_split: 2
+    random_state: 42
+    export_path: "models/random_forest.json"
+
+  xgboost_policy:
+    n_estimators: 100
+    max_depth: 6
+    learning_rate: 0.05
+    random_state: 42
+    export_path: "models/xgboost_policy.json"
+
+labels:
+  0: "normal"
+  1: "cpu-pressure"
+  2: "error-spike"
+  3: "pod-restart"
+
+remediations:
+  normal: "NO_ACTION"
+  cpu-pressure: "SCALE_UP_REPLICAS"
+  error-spike: "RESTART_POD"
+  pod-restart: "ROLLBACK_DEPLOYMENT"

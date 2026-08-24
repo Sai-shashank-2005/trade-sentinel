@@ -12,8 +12,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: trade-sentinel.local
-      http:
+    - http:
         paths:
           - path: /api(/|$)(.*)
             pathType: ImplementationSpecific

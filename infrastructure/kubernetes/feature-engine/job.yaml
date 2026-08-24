@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: feature-engine-job
+  namespace: trade-sentinel
+spec:
+  template:
+    spec:
+      containers:
+      - name: feature-engine
+        image: kubeheals-feature-engine
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Never

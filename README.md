@@ -1,8 +1,8 @@
-# 🌐 Trade Sentinel AI v2.5
+# 🌐 Trade Sentinel AI v3.0
 
 [![Role](https://img.shields.io/badge/Role-SOC%20Analyst-blue.svg)]()
-[![Framework](https://img.shields.io/badge/Architecture-Hybrid%20AI%20%2B%20Rule%20Engine-purple.svg)]()
-[![Backend](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Scikit--Learn-green.svg)]()
+[![Framework](https://img.shields.io/badge/Architecture-Hybrid%20AI%20%2B%20KubeHeals-purple.svg)]()
+[![Backend](https://img.shields.io/badge/Backend-FastAPI%20%2B%20Go%20%2B%20Scikit--Learn-green.svg)]()
 [![Frontend](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-blue.svg)]()
 
 > **Context-Aware Hybrid Trade Risk Intelligence Platform**
@@ -84,14 +84,15 @@ Combines statistical deviations with deterministic rules:
 
 ---
 
-## 🏗️ Cloud-Native Architecture
+## 🏗️ Cloud-Native Architecture & KubeHeals (v3.0)
 
-The repository is built for enterprise-scale deployments, cleanly separating application source code from Kubernetes infrastructure:
+The repository is built for enterprise-scale deployments, cleanly separating application source code from Kubernetes infrastructure. **v3.0 introduces KubeHeals**, an underlying infrastructure auto-remediation layer powered by ML.
 
 *   **`apps/`**: The core Trade Sentinel application (FastAPI & React) and load generators.
-*   **`infrastructure/`**: Kubernetes deployments, StatefulSets, and Prometheus/Loki configurations.
-*   **`telemetry/`**: Structured JSON metrics and logs captured from failure simulations.
-*   **`services/`**: Feature Engineering extensions.
+*   **`infrastructure/`**: Kubernetes deployments, StatefulSets, and Prometheus/Loki observability configurations.
+*   **`services/`**: High-performance Go microservices (`aqx-normalizer`, `feature-engine`) and Python AI engines driving KubeHeals automated remediation.
+*   **`telemetry/`**: Structured JSON metrics, generated datasets, and logs captured from failure simulations for KubeHeals model training.
+*   **`test-datasets/`**: Readily accessible CSV datasets and symlinks used for ML validation and root-level application testing.
 
 ---
 

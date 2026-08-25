@@ -105,6 +105,7 @@ up: ## Smart Instant-Up: Fast-boots cluster, verifies ingress & waits for full p
 	printf "  \033[1;36mDIRECT IP ACCESS  :\033[0m \033[1;32mhttp://$$MINI_IP\033[0m\n"; \
 	printf "  \033[1;36mLOCAL HOSTNAME    :\033[0m http://trade-sentinel.local (optional)\n"; \
 	printf "  \033[1;36mSTATUS            :\033[0m \033[1;32mReady & Serving Traffic\033[0m\n\n"
+	@if command -v ffplay >/dev/null 2>&1; then ffplay -nodisp -autoexit -hide_banner -loglevel quiet scripts/sounds/anime_wow.mp3 & fi
 
 down: ## Tear down the Kubernetes cluster
 	@printf "\033[1;31m================================================================================\033[0m\n"
@@ -112,6 +113,9 @@ down: ## Tear down the Kubernetes cluster
 	@printf "\033[1;31m================================================================================\033[0m\n"
 	@printf "\033[1;33m[*] Halting Kubernetes Control Plane (Minikube)...\033[0m\n"
 	@minikube stop
+	@if command -v ffplay >/dev/null 2>&1; then ffplay -nodisp -autoexit -hide_banner -loglevel quiet scripts/sounds/vine_boom.mp3 & fi
+	@bash -c 'printf "\n  \033[1;31mO\033[0m"; sleep 0.1; printf "\033[1;31mO\033[0m"; sleep 0.1; printf "\033[1;31mP\033[0m"; sleep 0.1; printf "\033[1;31mS\033[0m"; sleep 0.1; printf "\033[1;31m.\033[0m"; sleep 0.1; printf "\033[1;31m.\033[0m"; sleep 0.1; printf "\033[1;31m.\033[0m\n"'
+	@sleep 0.5
 	@printf "\n\033[1;32m================================================================================\033[0m\n"
 	@printf "                         \033[1;32mCLUSTER TERMINATED SAFELY\033[0m                           \n"
 	@printf "\033[1;32m================================================================================\033[0m\n\n"

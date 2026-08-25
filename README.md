@@ -8,6 +8,10 @@
 > **Context-Aware Hybrid Trade Risk Intelligence Platform**
 > Trade Sentinel AI is a hybrid anomaly detection system designed to identify suspicious transaction behavior using techniques aligned with modern threat detection systems. Legacy systems suffer from high false positives, static detection logic, and limited explainability. This project introduces a hybrid intelligence architecture that improves detection accuracy while maintaining operational efficiency.
 
+> [!WARNING]
+> **🚧 Roadmap Notice (v3.0)**
+> The underlying **KubeHeals** ML-driven auto-remediation infrastructure is currently under active development. In parallel, the core Trade Sentinel internals are scheduled to be upgraded into a highly scalable, real-world enterprise risk engine.
+
 ---
 
 ## 🛡️ Cybersecurity & SOC Relevance
